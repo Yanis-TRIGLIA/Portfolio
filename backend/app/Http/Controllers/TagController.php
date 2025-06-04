@@ -15,6 +15,11 @@ class TagController extends Controller
         $tags = Tag::all();
         return response()->json($tags);
     }
+    public function show($id)
+    {
+        $tag = Tag::findOrFail($id);
+        return response()->json($tag);
+    }
 
 
     public function store(Request $request)
@@ -36,9 +41,9 @@ class TagController extends Controller
         $tag = Tag::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'categories' => 'required|in:Backend,Frontend,Autres',
-            'master_percentage' => 'required|integer|min:0|max:100'
+            'name' => 'string|max:255',
+            'categories' => 'in:Backend,Frontend,Autres',
+            'master_percentage' => 'integer|min:0|max:100'
         ]);
 
         $tag->update($validated);

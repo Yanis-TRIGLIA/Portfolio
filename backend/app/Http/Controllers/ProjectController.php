@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\project;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -13,8 +14,14 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::all();
+        $projects = Project::with('tag')->get();
         return response()->json($projects);
+    }
+
+    public function show($id)
+    {
+        $project = Project::with('tag')->findOrFail($id);
+        return response()->json($project);
     }
 
 
@@ -70,7 +77,7 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
 
-        
+
         $validated = $request->validate([
             'name' => 'string|max:255',
             'description' => 'string',
@@ -81,22 +88,37 @@ class ProjectController extends Controller
 
         if ($request->hasFile('image_url')) {
             if ($project->images && file_exists(public_path($project->images))) {
-                unlink(public_path($project->images));
+                // Supprimer l'ancienne image
             }
 
             $image = $request->file('image_url');
             $filename = 'images/' . uniqid() . '.' . $image->getClientOriginalExtension();
 
-            $image->move(public_path('storage/images'), $filename);
+
+            $image->move(public_path('storage/images_project'), $filename);
             $validated['image_url'] = 'storage/' . $filename;
         }
 
 
         $project->update($validated);
-        if(isset($validated['tag'])) {
+        if (isset($validated['tag'])) {
             $project->tag()->sync($validated['tag']);
-        } 
+        }
 
         return response()->json($project->load('tag'));
+    }
+
+    public function destroy($id)
+    {
+        $project = Project::findOrFail($id);
+
+        if ($project->images && file_exists(public_path($project->images))) {
+            // Supprimer l'ancienne image
+        }
+
+        $project->tag()->detach();
+        $project->delete();
+
+        return response()->json(['message' => 'Projet supprimé avec succès']);
     }
 }
