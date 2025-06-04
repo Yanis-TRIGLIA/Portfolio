@@ -64,9 +64,10 @@ class BlogController extends Controller
 
     public function update(Request $request, $id)
     {
+
         $blog = Blog::findOrFail($id);
 
-           $validated = $request->validate([
+        $validated = $request->validate([
             'title' => 'string|max:255',
             'content' => 'string',
             'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -79,7 +80,8 @@ class BlogController extends Controller
 
 
         if ($request->hasFile('cover')) {
-            
+            Log::info('Mise à jour de l\'image pour le blog ID: ' . $id);
+
             if ($blog->cover && file_exists(public_path($blog->cover))) {
                 unlink(public_path($blog->cover));
             }
@@ -90,30 +92,33 @@ class BlogController extends Controller
             $image->move(public_path('storage/cover_blog'), $filename);
 
             $validated['cover'] = 'storage/' . $filename;
+            Log::info('Image mise à jour : ' . $validated['cover']);
         }
 
-       
+
 
         $blog->update($validated);
+        if (isset($validated['tag'])) {
+            $blog->tag()->sync($validated['tag']);
+        }
 
-         return response()->json([
+        return response()->json([
             'message' => 'Post mise à jour avec succès',
             'blog' => $blog
         ], 201);
     }
 
 
-     public function destroy($id)
+    public function destroy($id)
     {
         $blog = Blog::findOrFail($id);
 
-        // Supprimer la photo de profil associée si elle existe
         if ($blog->cover && file_exists(public_path($blog->cover))) {
             unlink(public_path($blog->cover));
         }
 
         $blog->delete();
-
+        $blog->tag()->detach();
         return response()->json(['message' => 'La post à était supprimé avec succès']);
     }
 }

@@ -88,7 +88,7 @@ class ProjectController extends Controller
 
         if ($request->hasFile('image_url')) {
             if ($project->images && file_exists(public_path($project->images))) {
-                // Supprimer l'ancienne image
+                unlink(public_path($project->images));
             }
 
             $image = $request->file('image_url');
@@ -112,8 +112,9 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
 
+
         if ($project->images && file_exists(public_path($project->images))) {
-            // Supprimer l'ancienne image
+            unlink(public_path($project->images));
         }
 
         $project->tag()->detach();
