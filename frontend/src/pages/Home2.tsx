@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { RefObject } from 'react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -9,19 +9,22 @@ import { Progress } from '../components/ui/progress';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Menu, X, ChevronDown, Mail, Phone, MapPin, Github, Linkedin, ExternalLink, Calendar, Building, GraduationCap, Code, BookOpen, CheckCircle, Users, Lightbulb, Heart, Camera, Plane, Clock, Award, Briefcase } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, ExternalLink, Calendar, Building, GraduationCap, Code, BookOpen, CheckCircle, Users, Lightbulb, Heart, Camera, Plane, Clock, Award, Briefcase } from 'lucide-react';
 import { GeometricCanvas } from '../components/GeometricCanvas';
 import { useIntersectionObserver } from '../hook/useIntersectionObserver';
 import Typewriter from '../components/text/Typewritter';
-
+import { api } from '../services/api';
+import type { Project, Tag } from '../lib/type';
 
 
 const Home2 = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [headerOpaque, setHeaderOpaque] = useState(false);
+
+
     const [selectedTag, setSelectedTag] = useState("all");
     const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
     const [showName, setShowName] = useState(true);
+    const [tag, setTag] = useState<Tag[]>([]);
+    const [projects, setProject] = useState<Project[]>([]);
     const [showTitle, setShowTitle] = useState(false);
     const [showDesc, setShowDesc] = useState(false);
 
@@ -30,6 +33,7 @@ const Home2 = () => {
     const experiencesRef = useRef<HTMLDivElement>(null);
     const projectsRef = useRef<HTMLDivElement>(null);
     const blogRef = useRef<HTMLDivElement>(null);
+
 
     const handleNameComplete = () => {
         setTimeout(() => {
@@ -102,148 +106,105 @@ const Home2 = () => {
         });
     });
 
+    const getallstats = async () => {
+        try {
+
+            const response = await api.get('/tag', null);
+            setTag(response as Tag[]);
+
+        } catch (error) {
+            console.error('Erreur lors de la récupération des posts:', error);
+        }
+    };
+    const getallprojects = async () => {
+        try {
+            const response = await api.get('/project', null);
+            setProject(response as Project[]);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des projets:', error);
+        }
+    }
+
     useEffect(() => {
+        getallstats();
+        getallprojects();
         const handleScroll = () => {
-            setHeaderOpaque(window.scrollY > 100);
+            if (bgRef.current) {
+                const speed = 0.3;
+                setOffsetY(window.scrollY * speed);
+            }
         };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const scrollToSection = (sectionId: string) => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-        setIsMenuOpen(false);
-    };
+
+    const tabValues = ["languages", "skills", "passions"]
+    const [activeTab, setActiveTab] = useState(tabValues[0])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setActiveTab((prev) => {
+                const currentIndex = tabValues.indexOf(prev)
+                const nextIndex = (currentIndex + 1) % tabValues.length
+                return tabValues[nextIndex]
+            })
+        }, 5000)
+
+        return () => clearInterval(interval)
+    }, [])
+
+
+
+
 
     const skills = {
-        frontend: [
-            { name: 'React', level: 85 },
-            { name: 'TypeScript', level: 80 },
-            { name: 'JavaScript', level: 90 },
-            { name: 'HTML/CSS', level: 95 },
-            { name: 'Angular', level: 70 }
-        ],
-        backend: [
-            { name: 'Java', level: 75 },
-            { name: 'Spring Boot', level: 70 },
-            { name: 'PHP', level: 65 },
-            { name: 'Laravel', level: 60 },
-            { name: 'PostgreSQL', level: 75 }
-        ],
-        others: [
-            { name: 'Git', level: 85 },
-            { name: 'Docker', level: 60 },
-            { name: 'Scrum', level: 80 },
-            { name: 'Linux', level: 70 }
-        ]
+
+        frontend: tag.filter(item => item.categories === "Frontend").map(item => (
+            {
+                name: item.name,
+                level: item.master_percentage,
+            }
+        )),
+        backend: tag.filter(item => item.categories === "Backend").map(item => (
+            {
+                name: item.name,
+                level: item.master_percentage,
+            }
+        )),
+        others: tag.filter(item => item.categories === "Autres").map(item => (
+            {
+                name: item.name,
+                level: item.master_percentage,
+            }
+        )),
     };
 
-    const projects = [
-        {
-            id: 1,
-            title: "Application E-commerce",
-            image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=250&fit=crop",
-            tags: ["React", "TypeScript", "Node.js"],
-            description: "Une application e-commerce complète avec gestion des commandes et paiements."
-        },
-        {
-            id: 2,
-            title: "Dashboard Analytics",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop",
-            tags: ["Angular", "Java", "Spring Boot"],
-            description: "Dashboard de visualisation de données en temps réel."
-        },
-        {
-            id: 3,
-            title: "API REST",
-            image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop",
-            tags: ["Laravel", "PHP", "MySQL"],
-            description: "API REST pour gestion d'inventaire avec authentification JWT."
-        }
-    ];
 
-    const blogPosts = [
-        {
-            id: 1,
-            title: "Les tendances du développement web en 2025",
-            image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=250&fit=crop",
-            excerpt: "Découvrez les technologies qui vont révolutionner le web cette année."
-        },
-        {
-            id: 2,
-            title: "Optimisation des performances React",
-            image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=250&fit=crop",
-            excerpt: "Techniques avancées pour améliorer les performances de vos applications React."
-        },
-        {
-            id: 3,
-            title: "Architecture microservices avec Spring Boot",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop",
-            excerpt: "Guide complet pour construire des microservices robustes."
-        }
-    ];
+
+
+
 
     const filteredProjects = selectedTag === "all"
         ? projects
-        : projects.filter(project => project.tags.includes(selectedTag));
+        : projects.filter(project => project.tags.map(String).includes(String(selectedTag)));
 
     const availableTags = ["all", ...Array.from(new Set(projects.flatMap(p => p.tags)))];
-
-    return (
+    const bgRef = useRef<HTMLDivElement>(null);
+    const [offsetY, setOffsetY] = useState(0);
+    function cn(...classes: (string | false | null | undefined)[]): string {
+        return classes.filter(Boolean).join(' ');
+    } return (
         <div className="min-h-screen">
-            {/* Header */}
-            <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${headerOpaque ? 'bg-white/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
-                }`}>
-                <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                        Portfolio
-                    </div>
 
-                    <nav className="hidden md:flex space-x-8">
-                        {['Accueil', 'À propos', 'Compétences', 'Diplômes', 'Expériences', 'Projets', 'Blog', 'Contact'].map((item, index) => (
-                            <button
-                                key={item}
-                                onClick={() => scrollToSection(['hero', 'about', 'skills', 'education', 'experience', 'projects', 'blog', 'contact'][index])}
-                                className="text-gray-700 hover:text-blue-600 transition-colors"
-                            >
-                                {item}
-                            </button>
-                        ))}
-                    </nav>
 
-                    <button
-                        className="md:hidden"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        {isMenuOpen ? <X /> : <Menu />}
-                    </button>
-                </div>
-
-                {isMenuOpen && (
-                    <div className="md:hidden bg-white/95 backdrop-blur-md border-t">
-                        <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-                            {['Accueil', 'À propos', 'Compétences', 'Diplômes', 'Expériences', 'Projets', 'Blog', 'Contact'].map((item, index) => (
-                                <button
-                                    key={item}
-                                    onClick={() => scrollToSection(['hero', 'about', 'skills', 'education', 'experience', 'projects', 'blog', 'contact'][index])}
-                                    className="text-left text-gray-700 hover:text-blue-600 transition-colors"
-                                >
-                                    {item}
-                                </button>
-                            ))}
-                        </nav>
-                    </div>
-                )}
-            </header>
-
-            {/* Hero Section */}
-            <section id="hero" className="relative h-screen flex items-center justify-center overflow-hidden">
+            <section id="hero" className="relative h-screen flex items-center justify-center overflow-hidden" >
                 <GeometricCanvas />
                 <div className="relative z-10 text-center text-white">
                     <h1 className="text-6xl md:text-8xl font-bold mb-4 min-h-[120px] md:min-h-[160px] flex items-center justify-center">
                         {showName && (
                             <Typewriter
-                                text="Julien Dupont"
+                                text="YANIS TRIGLIA"
                                 onComplete={handleNameComplete}
                             />
                         )}
@@ -258,8 +219,8 @@ const Home2 = () => {
                                     text="Développeur Full Stack"
                                     onComplete={handledescriptioncomplete}
                                 />
-                                {!showDesc && 
-                                <span className="animate-pulse ml-2">|</span>
+                                {!showDesc &&
+                                    <span className="animate-pulse ml-2">|</span>
                                 }
                             </>
                         )}
@@ -268,48 +229,72 @@ const Home2 = () => {
             </section>
 
             {/* About Section */}
-            <section id="about" className="py-20 bg-gray-50">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-2xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+
+            {/* Contenu */}
+            <section id="about" className="relative py-20 overflow-hidden">
+                <div
+                    ref={bgRef}
+                    className="absolute top-0 left-0 w-full h-[200%] bg-cover bg-center"
+
+                    style={{
+                        backgroundImage: `url('/images/coding.jpg')`,
+                        transform: `translateY(-${offsetY}px)`
+                        ,
+                    }}
+                ></div>
+
+
+                <div className="absolute inset-0 bg-black/40  z-10"></div>
+
+                {/* Contenu */}
+                <div className="relative z-20 container mx-auto px-4">
+                    <h2 className="text-2xl font-bold mb-12 font-serif text-white leading-tight categories_white">
                         À propos
                     </h2>
                     <div className="grid md:grid-cols-2 gap-16 items-start">
-                        <div className="flex justify-start">
+                        <div className="flex justify-start space-x-2">
                             <img
                                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
                                 alt="Portrait"
-                                className="w-64 h-64 rounded-full object-cover shadow-lg"
+                                className="w-52 h-52 rounded-full object-cover shadow-lg"
                             />
+
+                            <p className="text-white text-base md:text-lg leading-relaxed py-5">
+                                Je suis un développeur web passionné avec un intérêt marqué pour les technologies émergentes,
+                                l’open source et le design fonctionnel. Mon parcours m’a permis de développer une solide
+                                capacité d’adaptation, une grande curiosité et un goût pour la collaboration.
+                            </p>
+
                         </div>
+
+
+
                         <div>
-                            <Tabs defaultValue="presentation" className="w-full">
-                                <TabsList className="grid w-full grid-cols-4 " style={{ backgroundColor: 'hsl(210 40% 96.1%)' }}>
-                                    <TabsTrigger value="presentation" className='cursor-pointer'>Présentation</TabsTrigger>
+
+
+                            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                                <TabsList className="grid w-full grid-cols-3 " style={{ backgroundColor: 'hsl(210 40% 96.1%)' }}>
                                     <TabsTrigger value="languages" className='cursor-pointer'>Langues</TabsTrigger>
                                     <TabsTrigger value="skills" className='cursor-pointer'>Soft Skills</TabsTrigger>
                                     <TabsTrigger value="passions" className='cursor-pointer'>Passions</TabsTrigger>
                                 </TabsList>
-                                <TabsContent value="presentation" className="mt-6">
-                                    <p className="text-gray-600 leading-relaxed">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                    </p>
-                                </TabsContent>
+
                                 <TabsContent value="languages" className="mt-6">
                                     <div className="grid grid-cols-3 gap-4 text-center">
                                         <div className="flex flex-col items-center">
                                             <span className="text-4xl mb-2">🇫🇷</span>
-                                            <span className="text-sm font-medium">Français</span>
-                                            <span className="text-xs text-gray-500">Langue maternelle</span>
+                                            <span className="text-sm font-medium text-white">Français</span>
+                                            <span className="text-xs text-gray-400">Langue maternelle</span>
                                         </div>
                                         <div className="flex flex-col items-center">
                                             <span className="text-4xl mb-2">🇬🇧</span>
-                                            <span className="text-sm font-medium">Anglais</span>
-                                            <span className="text-xs text-gray-500">Niveau B2</span>
+                                            <span className="text-sm font-medium text-white">Anglais</span>
+                                            <span className="text-xs text-gray-400">Niveau B2</span>
                                         </div>
                                         <div className="flex flex-col items-center">
                                             <span className="text-4xl mb-2">🇮🇹</span>
-                                            <span className="text-sm font-medium">Italien</span>
-                                            <span className="text-xs text-gray-500">Niveau B1</span>
+                                            <span className="text-sm font-medium text-white">Italien</span>
+                                            <span className="text-xs text-gray-400">Niveau B1</span>
                                         </div>
                                     </div>
                                 </TabsContent>
@@ -369,6 +354,17 @@ const Home2 = () => {
                                         </div>
                                     </div>
                                 </TabsContent>
+                                <div className="flex justify-center gap-2 mt-6">
+                                    {tabValues.map((tab) => (
+                                        <div
+                                            key={tab}
+                                            className={cn(
+                                                "w-3 h-3 rounded-full border border-white transition-all duration-300",
+                                                activeTab === tab ? "bg-white" : "bg-transparent opacity-50"
+                                            )}
+                                        />
+                                    ))}
+                                </div>
                             </Tabs>
                         </div>
                     </div>
@@ -376,9 +372,9 @@ const Home2 = () => {
             </section>
 
             {/* Skills Section */}
-            <section id="skills" className="py-20" ref={skillsRef}>
+            <section id="skills" className="py-20" ref={skillsRef} >
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Compétences
                     </h2>
                     <div className="grid md:grid-cols-3 gap-8">
@@ -397,8 +393,10 @@ const Home2 = () => {
                                             </div>
                                             <Progress
                                                 value={visibleSections.has('skills') ? skill.level : 0}
-                                                className="h-3 transition-all duration-[2000ms] ease-out"
-                                            />
+                                                className="h-3"
+                                            >
+                                            </Progress>
+
                                         </div>
                                     ))}
                                 </div>
@@ -408,81 +406,103 @@ const Home2 = () => {
                 </div>
             </section>
 
-            {/* Education Timeline */}
-            <section id="education" className="py-20 bg-gray-50" ref={timelineRef}>
-                <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+            <section
+                id="education"
+                className="relative py-20 overflow-hidden"
+                ref={timelineRef}
+            >
+                <div
+                    className="absolute inset-0 z-0 bg-cover bg-center "
+                    style={{ backgroundImage: `url('/images/diplomes.webp')` }}
+                ></div>
+
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-10"></div>
+
+                {/* Contenu au premier plan */}
+                <div className="relative z-20 container mx-auto px-4">
+                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Diplômes
                     </h2>
+
                     <div className="relative max-w-4xl mx-auto">
                         <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
 
+                        {/* 1er diplôme */}
                         <div className={`relative transition-all duration-1000 ${visibleSections.has('timeline') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
                             <div className="flex items-start mb-12">
                                 <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center relative z-10 shadow-lg">
                                     <GraduationCap className="h-8 w-8 text-white" />
                                 </div>
                                 <div className="ml-8 bg-white p-8 rounded-xl shadow-lg border-l-4 border-blue-500 flex-1">
-                                    <div className="flex items-center mb-3">
-                                        <Calendar className="mr-2 h-5 w-5 text-blue-600" />
-                                        <span className="text-blue-600 font-bold text-lg">2024 – 2026</span>
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-3 text-gray-800">Mastère Professionnel Manager en Architecture et Applications Logicielles des SI</h3>
-                                    <div className="flex items-center text-gray-600">
-                                        <Building className="mr-2 h-4 w-4" />
-                                        <span>CESI Aix-en-Provence</span>
-                                    </div>
+                                    <a href='https://www.cesi.fr/formation/manager-en-architecture-et-applications-logicielles-des-si-en-alternance-2371646/' target='_blank'>
+                                        <div className="flex items-center mb-3">
+                                            <Calendar className="mr-2 h-5 w-5 text-blue-600" />
+                                            <span className="text-blue-600 font-bold text-lg">2024 – 2026</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-3 text-gray-800">Mastère Professionnel Manager en Architecture et Applications Logicielles des SI</h3>
+                                        <div className="flex items-center text-gray-600">
+                                            <Building className="mr-2 h-4 w-4" />
+                                            <span>CESI Aix-en-Provence</span>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
 
+                        {/* 2e diplôme */}
                         <div className={`relative transition-all duration-1000 delay-300 ${visibleSections.has('timeline') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
-                            <div className="flex items-start mb-12">
-                                <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center relative z-10 shadow-lg">
-                                    <Code className="h-8 w-8 text-white" />
-                                </div>
-                                <div className="ml-8 bg-white p-8 rounded-xl shadow-lg border-l-4 border-green-500 flex-1">
-                                    <div className="flex items-center mb-3">
-                                        <Calendar className="mr-2 h-5 w-5 text-green-600" />
-                                        <span className="text-green-600 font-bold text-lg">2021 – 2024</span>
+                            <a href='https://iut.univ-amu.fr/fr/formations/bachelor-universitaire-de-technologie/but-informatique/but-info-aix' target='_blank'>
+                                <div className="flex items-start mb-12">
+                                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center relative z-10 shadow-lg">
+                                        <Code className="h-8 w-8 text-white" />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-3 text-gray-800">BUT Informatique (Parcours A)</h3>
-                                    <p className="text-gray-600 mb-3">Réalisation d'applications : conception, développement, validation</p>
-                                    <div className="flex items-center text-gray-600">
-                                        <Building className="mr-2 h-4 w-4" />
-                                        <span>IUT d'Aix-Marseille, site d'Aix-en-Provence</span>
+                                    <div className="ml-8 bg-white p-8 rounded-xl shadow-lg border-l-4 border-green-500 flex-1">
+                                        <div className="flex items-center mb-3">
+                                            <Calendar className="mr-2 h-5 w-5 text-green-600" />
+                                            <span className="text-green-600 font-bold text-lg">2021 – 2024</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-3 text-gray-800">BUT Informatique (Parcours A)</h3>
+                                        <p className="text-gray-600 mb-3">Réalisation d'applications : conception, développement, validation</p>
+                                        <div className="flex items-center text-gray-600">
+                                            <Building className="mr-2 h-4 w-4" />
+                                            <span>IUT d'Aix-Marseille, site d'Aix-en-Provence</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
+                        {/* 3e diplôme */}
                         <div className={`relative transition-all duration-1000 delay-600 ${visibleSections.has('timeline') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
-                            <div className="flex items-start">
-                                <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center relative z-10 shadow-lg">
-                                    <Award className="h-8 w-8 text-white" />
-                                </div>
-                                <div className="ml-8 bg-white p-8 rounded-xl shadow-lg border-l-4 border-purple-500 flex-1">
-                                    <div className="flex items-center mb-3">
-                                        <Calendar className="mr-2 h-5 w-5 text-purple-600" />
-                                        <span className="text-purple-600 font-bold text-lg">2020</span>
+                            <a href='https://www.site.ac-aix-marseille.fr/lyc-mendesfrance-vitrolles/spip/-Baccalaureat-STI2D-Sciences-et-Technologies-de-l-Industrie-et-du-Developpement-49-.html' target='_blank'>
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center relative z-10 shadow-lg">
+                                        <Award className="h-8 w-8 text-white" />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-3 text-gray-800">Baccalauréat STI2D</h3>
-                                    <p className="text-gray-600 mb-3">Option systèmes d'information numérique</p>
-                                    <div className="flex items-center text-gray-600">
-                                        <Building className="mr-2 h-4 w-4" />
-                                        <span>Lycée Pierre Mendès-France</span>
+                                    <div className="ml-8 bg-white p-8 rounded-xl shadow-lg border-l-4 border-purple-500 flex-1">
+                                        <div className="flex items-center mb-3">
+                                            <Calendar className="mr-2 h-5 w-5 text-purple-600" />
+                                            <span className="text-purple-600 font-bold text-lg">2020</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-3 text-gray-800">Baccalauréat STI2D</h3>
+                                        <p className="text-gray-600 mb-3">Option systèmes d'information numérique</p>
+                                        <div className="flex items-center text-gray-600">
+                                            <Building className="mr-2 h-4 w-4" />
+                                            <span>Lycée Pierre Mendès-France</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
             </section>
 
+
             {/* Experience Section */}
             <section id="experience" className="py-20" ref={experiencesRef}>
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Expériences
                     </h2>
                     <div className="space-y-8">
@@ -560,7 +580,7 @@ const Home2 = () => {
             {/* Projects Section */}
             <section id="projects" className="py-20 bg-gray-50" ref={projectsRef}>
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Projets
                     </h2>
                     <div className="mb-8 flex justify-center">
@@ -570,16 +590,18 @@ const Home2 = () => {
                             </SelectTrigger>
                             <SelectContent>
                                 {availableTags.map(tag => (
-                                    <SelectItem key={tag} value={tag}>
-                                        {tag === "all" ? "Tous les projets" : tag}
+                                    <SelectItem key={String(tag)} value={String(tag)}>
+                                        {tag === "all" ? "Tous les projets" : String(tag)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
+                
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredProjects.map((project, index) => (
+                        { projects.map((project, index) => (
+                            
                             <Card
                                 key={project.id}
                                 className={`overflow-hidden hover:shadow-lg transition-all duration-1000 cursor-pointer ${visibleSections.has('projects') ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
@@ -589,18 +611,18 @@ const Home2 = () => {
                             >
                                 <div className="aspect-video overflow-hidden">
                                     <img
-                                        src={project.image}
-                                        alt={project.title}
+                                        src={`http://127.0.0.1:8000/${project.images}`}
+                                        alt={project.name}
                                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
                                 <CardContent className="p-6">
-                                    <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                                    <p className="text-gray-600 mb-4">{project.description}</p>
+                                    <h3 className="text-xl font-semibold mb-2">{project.name}</h3>
+                                    <p className="text-gray-600 mb-4">{project.decription}</p>
                                     <div className="flex flex-wrap gap-2">
-                                        {project.tags.map(tag => (
-                                            <Badge key={tag} variant="secondary">{tag}</Badge>
-                                        ))}
+                                        {/* {project.tags.map(tag => (
+                                            <Badge key={tag.id ?? tag.name} variant="secondary">{tag.name}</Badge>
+                                        ))} */}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -612,10 +634,10 @@ const Home2 = () => {
             {/* Blog Section */}
             <section id="blog" className="py-20" ref={blogRef}>
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Blog
                     </h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {blogPosts.map((post, index) => (
                             <Card
                                 key={post.id}
@@ -637,7 +659,7 @@ const Home2 = () => {
                                 </CardContent>
                             </Card>
                         ))}
-                    </div>
+                    </div> */}
                 </div>
             </section>
 
@@ -703,7 +725,7 @@ const Home2 = () => {
                     </div>
                 </div>
             </section>
-        </div>
+        </div >
     );
 };
 

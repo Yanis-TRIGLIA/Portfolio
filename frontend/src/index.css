@@ -1,9 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
 
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 
 @layer base {
@@ -111,4 +109,21 @@
   }
 }
 
+.categories:after {
+    content: "-";
+    color: black;
+}
 
+.categories:before {
+    content: "-";
+    color: black;
+}
+
+.categories_white:after {
+    content: "-";
+    color: white;
+}
+.categories_white:before {
+    content: "-";
+    color: white;
+}
