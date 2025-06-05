@@ -243,7 +243,7 @@ const Home2 = () => {
             {/* About Section */}
             <section id="about" className="py-20 bg-gray-50">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight">
+                    <h2 className="text-2xl font-bold mb-12 font-serif text-gray-800 leading-tight">
                         À propos
                     </h2>
                     <div className="grid md:grid-cols-2 gap-16 items-start">
@@ -255,12 +255,12 @@ const Home2 = () => {
                             />
                         </div>
                         <div>
-                            <Tabs defaultValue="presentation" className="w-full">
-                                <TabsList className="grid w-full grid-cols-4">
-                                    <TabsTrigger value="presentation">Présentation</TabsTrigger>
-                                    <TabsTrigger value="languages">Langues</TabsTrigger>
-                                    <TabsTrigger value="skills">Soft Skills</TabsTrigger>
-                                    <TabsTrigger value="passions">Passions</TabsTrigger>
+                            <Tabs  defaultValue="presentation" className="w-full">
+                                <TabsList className="grid w-full grid-cols-4 " style={{ backgroundColor: 'hsl(210 40% 96.1%)' }}>
+                                    <TabsTrigger value="presentation" className='cursor-pointer'>Présentation</TabsTrigger>
+                                    <TabsTrigger value="languages" className='cursor-pointer'>Langues</TabsTrigger>
+                                    <TabsTrigger value="skills" className='cursor-pointer'>Soft Skills</TabsTrigger>
+                                    <TabsTrigger value="passions" className='cursor-pointer'>Passions</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="presentation" className="mt-6">
                                     <p className="text-gray-600 leading-relaxed">
