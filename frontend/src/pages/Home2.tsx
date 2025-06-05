@@ -12,18 +12,35 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Menu, X, ChevronDown, Mail, Phone, MapPin, Github, Linkedin, ExternalLink, Calendar, Building, GraduationCap, Code, BookOpen, CheckCircle, Users, Lightbulb, Heart, Camera, Plane, Clock, Award, Briefcase } from 'lucide-react';
 import { GeometricCanvas } from '../components/GeometricCanvas';
 import { useIntersectionObserver } from '../hook/useIntersectionObserver';
+import Typewriter from '../components/text/Typewritter';
+
+
 
 const Home2 = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [headerOpaque, setHeaderOpaque] = useState(false);
     const [selectedTag, setSelectedTag] = useState("all");
     const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+    const [showName, setShowName] = useState(true);
+    const [showTitle, setShowTitle] = useState(false);
+    const [showDesc, setShowDesc] = useState(false);
 
     const skillsRef = useRef<HTMLDivElement>(null);
     const timelineRef = useRef<HTMLDivElement>(null);
     const experiencesRef = useRef<HTMLDivElement>(null);
     const projectsRef = useRef<HTMLDivElement>(null);
     const blogRef = useRef<HTMLDivElement>(null);
+
+    const handleNameComplete = () => {
+        setTimeout(() => {
+            setShowTitle(true);
+        }, 500);
+    };
+    const handledescriptioncomplete = () => {
+        setTimeout(() => {
+            setShowDesc(true);
+        }, 500);
+    };
 
     useIntersectionObserver(skillsRef as RefObject<Element>, (isVisible) => {
         setVisibleSections(prev => {
@@ -223,20 +240,30 @@ const Home2 = () => {
             <section id="hero" className="relative h-screen flex items-center justify-center overflow-hidden">
                 <GeometricCanvas />
                 <div className="relative z-10 text-center text-white">
-                    <h1 className="text-6xl md:text-8xl font-bold mb-4 animate-fade-in">
-                        Julien Dupont
+                    <h1 className="text-6xl md:text-8xl font-bold mb-4 min-h-[120px] md:min-h-[160px] flex items-center justify-center">
+                        {showName && (
+                            <Typewriter
+                                text="Julien Dupont"
+                                onComplete={handleNameComplete}
+                            />
+                        )}
+                        {!showTitle &&
+                            <span className="animate-pulse ml-2">|</span>
+                        }
                     </h1>
-                    <p className="text-xl md:text-2xl mb-8 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                        Développeur Full Stack
+                    <p className="text-xl md:text-2xl mb-8 min-h-[40px] flex items-center justify-center">
+                        {showTitle && (
+                            <>
+                                <Typewriter
+                                    text="Développeur Full Stack"
+                                    onComplete={handledescriptioncomplete}
+                                />
+                                {!showDesc && 
+                                <span className="animate-pulse ml-2">|</span>
+                                }
+                            </>
+                        )}
                     </p>
-                    <Button
-                        onClick={() => scrollToSection('about')}
-                        className="animate-fade-in bg-blue-600 hover:bg-blue-700"
-                        style={{ animationDelay: '1s' }}
-                    >
-                        Découvrir mon profil
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
                 </div>
             </section>
 
@@ -255,7 +282,7 @@ const Home2 = () => {
                             />
                         </div>
                         <div>
-                            <Tabs  defaultValue="presentation" className="w-full">
+                            <Tabs defaultValue="presentation" className="w-full">
                                 <TabsList className="grid w-full grid-cols-4 " style={{ backgroundColor: 'hsl(210 40% 96.1%)' }}>
                                     <TabsTrigger value="presentation" className='cursor-pointer'>Présentation</TabsTrigger>
                                     <TabsTrigger value="languages" className='cursor-pointer'>Langues</TabsTrigger>
