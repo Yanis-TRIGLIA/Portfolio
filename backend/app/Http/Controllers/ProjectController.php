@@ -32,7 +32,10 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
             'description' => 'required|string',
+            'link_project' => 'nullable|string|max:255',
+            'github_project' => 'nullable|string|max:255',
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'required|array',
             'tag.*' => 'exists:tags,id',
@@ -41,7 +44,7 @@ class ProjectController extends Controller
 
         if ($request->hasFile('image_url')) {
             $image = $request->file('image_url');
-            $filename = 'images/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $filename = 'images_project/' . uniqid() . '.' . $image->getClientOriginalExtension();
 
             $image->move(public_path('storage/images_project'), $filename);
 
@@ -55,6 +58,9 @@ class ProjectController extends Controller
 
         $project = Project::create([
             'name' => $validated['name'],
+            'slug' => $validated['slug'],
+            'link_project' => $validated['link_project'] ?? null,
+            'github_project' => $validated['github_project'] ?? null,
             'description' => $validated['description'],
             'images' => $validated['images_url'],
 
@@ -80,6 +86,9 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'name' => 'string|max:255',
+            'slug' => 'string|max:255',
+            'link_project' => 'nullable|string|max:255',
+            'github_project' => 'nullable|string|max:255',
             'description' => 'string',
             'image_url' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'array',
@@ -92,11 +101,11 @@ class ProjectController extends Controller
             }
 
             $image = $request->file('image_url');
-            $filename = 'images/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $filename = 'images_project/' . uniqid() . '.' . $image->getClientOriginalExtension();
 
 
             $image->move(public_path('storage/images_project'), $filename);
-            $validated['image_url'] = 'storage/' . $filename;
+            $validated['images'] = "storage/{$filename}";
         }
 
 

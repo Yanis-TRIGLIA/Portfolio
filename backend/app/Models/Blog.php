@@ -11,7 +11,8 @@ class Blog extends Model
     use HasFactory;
     
     protected $fillable = [
-        'title', 
+        'title',
+        'slug', 
         'content', 
         'cover', 
         'meta_title', 

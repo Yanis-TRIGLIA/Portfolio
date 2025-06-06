@@ -3,6 +3,7 @@ export type Blog_table = {
   cover: string;
   created_at: string;
   title: string;
+  slug: string;
   content: string;
   meta_title: string;
   meta_description: string;
@@ -22,11 +23,11 @@ export type Project_table = {
   id: number;
   name: string;
   created_at: string;
-  decription: string;
+  description: string;
   images: string;
-  tags: Tag_table[];
-
-  
+  tag: Tag_table[];
+  link_project: string;
+  github_project: string;
 };
 
 export type Blog = Blog_table;

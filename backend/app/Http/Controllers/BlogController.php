@@ -29,6 +29,7 @@ class BlogController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
             'content' => 'required|string',
             'cover' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'required|array',
@@ -69,6 +70,7 @@ class BlogController extends Controller
 
         $validated = $request->validate([
             'title' => 'string|max:255',
+            'slug' => 'string|max:255',
             'content' => 'string',
             'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'array',

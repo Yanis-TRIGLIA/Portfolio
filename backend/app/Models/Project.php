@@ -11,8 +11,11 @@ class Project extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'images',
+        'link_project',
+        'github_project',
  
     ];
 
