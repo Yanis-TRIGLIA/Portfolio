@@ -11,10 +11,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onLoadingComplete }) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setShowY(true), 500);
-    const timer2 = setTimeout(() => setShowT(true), 1500);
-    const timer3 = setTimeout(() => setFadeOut(true), 3500);
-    const timer4 = setTimeout(() => onLoadingComplete(), 4000);
+    const timer1 = setTimeout(() => setShowY(true), 250);
+    const timer2 = setTimeout(() => setShowT(true), 500);
+    const timer3 = setTimeout(() => setFadeOut(true), 2500);
+    const timer4 = setTimeout(() => onLoadingComplete(), 3000);
 
     return () => {
       clearTimeout(timer1);
