@@ -4,8 +4,9 @@ interface Props {
   children: React.ReactNode;
 }
 
+
 const ProtectedRoute = ({ children }: Props) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("token");
 
   if (!token) {
     return <Navigate to="/access-denied" replace />;

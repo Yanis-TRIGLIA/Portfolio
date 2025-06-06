@@ -42,7 +42,7 @@ const Headers = () => {
                     ))}
                     {token && (
                         <div>
-                        <button onClick={logout} className="ml-4 bg-blue-500 text-white p-2 rounded">Admin</button>
+                        <a href="/admin"><button className="ml-4 bg-blue-500 text-white p-2 rounded pointer-events-auto">Admin</button></a>
                         <button onClick={logout} className="ml-4 bg-red-500 text-white p-2 rounded">Se déconnecter</button>
                         </div>
                     )}

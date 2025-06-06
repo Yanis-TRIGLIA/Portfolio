@@ -12,7 +12,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+    const isLoggedIn = localStorage.getItem('token');
     if (!isLoggedIn) {
       navigate('/login');
     }
@@ -25,7 +25,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
@@ -59,7 +58,7 @@ const AdminDashboard = () => {
           </TabsList>
 
           <TabsContent value="projects">
-            <Card>
+            <Card className='bg-white shadow-md'>
               <CardHeader>
                 <CardTitle>Gestion des Projets</CardTitle>
                 <CardDescription>

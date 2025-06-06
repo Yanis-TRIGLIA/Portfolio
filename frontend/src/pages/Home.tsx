@@ -33,6 +33,7 @@ const Home = () => {
     const [showTitle, setShowTitle] = useState(false);
     const [showDesc, setShowDesc] = useState(false);
     const [closedProjects, setClosedProjects] = useState<Set<number>>(new Set());
+    
 
     const skillsRef = useRef<HTMLDivElement>(null);
     const timelineRef = useRef<HTMLDivElement>(null);
