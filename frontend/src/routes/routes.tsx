@@ -7,6 +7,7 @@ import Login from "../pages/admin/Login";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AccessDenied from "../components/auth/AccessDenied";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
+import BlogDetail from "../pages/BlogDetail";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
   {
     path: "project/:id",
     element: <ProjectDetail />,
+  },
+  {
+    path:"blog/:id",
+    element: <BlogDetail />, 
   },
   {
     path: "admin",
