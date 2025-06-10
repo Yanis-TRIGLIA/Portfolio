@@ -14,7 +14,7 @@ interface Node {
 
 export const GeometricCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
   const [nodes, setNodes] = useState<Node[]>([]);
   const isInitialized = useRef(false);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -121,7 +121,7 @@ export const GeometricCanvas: React.FC = () => {
   };
 
   const drawConnections = (ctx: CanvasRenderingContext2D) => {
-    nodes.forEach((node, i) => {
+    nodes.forEach((node) => {
       node.connections.forEach(connectionIndex => {
         const connectedNode = nodes[connectionIndex];
         if (!connectedNode) return;

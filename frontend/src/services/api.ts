@@ -12,7 +12,7 @@ export const api = {
         return res.json();
     },
 
-    async get<T>(url: string, token: null|string) {
+    async get<T>(url: string, token: null | string) {
         const res = await fetch(`${API_BASE}${url}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -52,6 +52,33 @@ export const api = {
 
         if (!res.ok) throw new Error('Échec de la requête DELETE');
         return res.json();
+    },
+
+
+    async postFormData<T>(url: string, formData: FormData, token: string) {
+        const res = await fetch(`${API_BASE}${url}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        if (!res.ok) throw new Error('Échec de la requête POST');
+        return res.json() as Promise<T>;
+    },
+
+    async putFormData<T>(url: string, formData: FormData, token: string) {
+        const res = await fetch(`${API_BASE}${url}`, {
+            method: 'POST', 
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        if (!res.ok) throw new Error('Échec de la requête PUT');
+        return res.json() as Promise<T>;
     }
 
 };

@@ -9,7 +9,7 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Mail, Phone, MapPin, Github, Linkedin, ExternalLink, Calendar, Building, GraduationCap, Code, BookOpen, CheckCircle, Users, Lightbulb, Heart, Camera, Plane, Clock, Award, Briefcase, Check, ChevronsUpDown, Search, X } from 'lucide-react';
 import { GeometricCanvas } from '../components/GeometricCanvas';
-import { useIntersectionObserver } from '../hook/useIntersectionObserver';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import Typewriter from '../components/text/Typewritter';
 import { api } from '../services/api';
 import type { Blog, Project, Tag } from '../lib/type';

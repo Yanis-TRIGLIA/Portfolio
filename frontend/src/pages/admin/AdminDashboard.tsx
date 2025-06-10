@@ -1,8 +1,8 @@
-import  {useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent,  CardHeader, CardTitle } from '../../components/ui/card';
 import { LogOut, FolderOpen, FileText, Tag } from 'lucide-react';
 import ProjectsManager from '../../components/admin/ProjectsManager';
 import BlogManager from '../../components/admin/BlogManager';
@@ -27,13 +27,13 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
-          <Button 
-            variant="outline" 
+          <a href='/'><h1 className="text-2xl font-bold text-gray-900">👑 Dashboard de Yanis 👑 </h1></a>
+          <Button
+            variant="outline"
             onClick={handleLogout}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 " />
             Déconnexion
           </Button>
         </div>
@@ -42,16 +42,16 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <div className="p-6">
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 max-w-md mb-8">
-            <TabsTrigger value="projects" className="flex items-center gap-2">
-              <FolderOpen className="w-4 h-4" />
+          <TabsList className="grid w-full grid-cols-3 max-w-md mb-8 bg-gray-300/50 rounded-lg ">
+            <TabsTrigger value="projects" className="flex items-center gap-2 cursor-pointer">
+              <FolderOpen className="w-4 h-4 " />
               Projets
             </TabsTrigger>
-            <TabsTrigger value="blog" className="flex items-center gap-2">
+            <TabsTrigger value="blog" className="flex items-center gap-2 cursor-pointer">
               <FileText className="w-4 h-4" />
               Blog
             </TabsTrigger>
-            <TabsTrigger value="tags" className="flex items-center gap-2">
+            <TabsTrigger value="tags" className="flex items-center gap-2 cursor-pointer">
               <Tag className="w-4 h-4" />
               Tags
             </TabsTrigger>
@@ -61,9 +61,7 @@ const AdminDashboard = () => {
             <Card className='bg-white shadow-md'>
               <CardHeader>
                 <CardTitle>Gestion des Projets</CardTitle>
-                <CardDescription>
-                  Gérez vos projets : ajouter, modifier ou supprimer
-                </CardDescription>
+
               </CardHeader>
               <CardContent>
                 <ProjectsManager />
@@ -75,9 +73,7 @@ const AdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Gestion du Blog</CardTitle>
-                <CardDescription>
-                  Gérez vos articles de blog
-                </CardDescription>
+
               </CardHeader>
               <CardContent>
                 <BlogManager />
@@ -87,15 +83,9 @@ const AdminDashboard = () => {
 
           <TabsContent value="tags">
             <Card>
-              <CardHeader>
-                <CardTitle>Gestion des Tags</CardTitle>
-                <CardDescription>
-                  Gérez les tags utilisés dans vos projets et articles
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <TagsManager />
-              </CardContent>
+
+              <TagsManager />
+
             </Card>
           </TabsContent>
         </Tabs>

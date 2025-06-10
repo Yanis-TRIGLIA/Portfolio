@@ -15,6 +15,7 @@ export type Tag_table = {
   categories: string;
   name: string;
   master_percentage	: number;
+  created_at: string;
 
 };
 

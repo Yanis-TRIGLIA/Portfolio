@@ -1,92 +1,115 @@
-
-import React from 'react';
+// TagForm.tsx
+import React, { useEffect, useState } from 'react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import { Select , SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-
-interface TagFormData {
-  name: string;
-  color: string;
-  category: 'technology' | 'skill' | 'tool';
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+import type { Tag } from '../../../lib/type';
 
 interface TagFormProps {
-  formData: TagFormData;
-  onFormDataChange: (data: TagFormData) => void;
-  onSubmit: () => void;
+  initialData?: Tag;
+  onSubmit: (data: Tag) => void;
   onCancel: () => void;
-  isEditing: boolean;
+  loading: boolean;
 }
 
 export const TagForm: React.FC<TagFormProps> = ({
-  formData,
-  onFormDataChange,
+  initialData,
   onSubmit,
   onCancel,
-  isEditing
+  loading
 }) => {
+  const [formData, setFormData] = useState<Omit<Tag, 'id' | 'created_at'>>({
+    name: '',
+    categories: 'Frontend',
+    master_percentage: 0,
+  });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name,
+        categories: initialData.categories,
+        master_percentage: initialData.master_percentage,
+      });
+    } else {
+      setFormData({
+        name: '',
+        categories: 'Frontend',
+        master_percentage: 0,
+      });
+    }
+  }, [initialData]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit();
+    onSubmit({
+      ...formData,
+      id: initialData?.id ?? 0,
+      created_at: initialData?.created_at || '',
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Nom du tag</Label>
+        <Label htmlFor="name">Nom du tag *</Label>
         <Input
           id="name"
           value={formData.name}
-          onChange={(e) => onFormDataChange({ ...formData, name: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="Ex: React, JavaScript..."
           required
+          disabled={loading}
         />
       </div>
 
       <div>
-        <Label htmlFor="color">Couleur</Label>
-        <div className="flex items-center gap-2">
-          <Input
-            id="color"
-            type="color"
-            value={formData.color}
-            onChange={(e) => onFormDataChange({ ...formData, color: e.target.value })}
-            className="w-16 h-10"
-          />
-          <Input
-            value={formData.color}
-            onChange={(e) => onFormDataChange({ ...formData, color: e.target.value })}
-            placeholder="#3B82F6"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="category">Catégorie</Label>
+        <Label htmlFor="category">Catégorie *</Label>
         <Select
-          value={formData.category}
-          onValueChange={(value: 'technology' | 'skill' | 'tool') => 
-            onFormDataChange({ ...formData, category: value })
+         value={initialData ? initialData.categories : formData.categories}
+          onValueChange={(value: 'Backend' | 'Frontend' | 'Autres') =>
+            setFormData({ ...formData, categories: value })
           }
+          disabled={loading}
         >
           <SelectTrigger>
             <SelectValue placeholder="Sélectionner une catégorie" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="technology">Technologie</SelectItem>
-            <SelectItem value="skill">Compétence</SelectItem>
-            <SelectItem value="tool">Outil</SelectItem>
+          <SelectContent className="z-50 bg-white">
+            <SelectItem value="Backend">Backend</SelectItem>
+            <SelectItem value="Frontend">Frontend</SelectItem>
+            <SelectItem value="Autres">Autres</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div>
+        <Label htmlFor="percentage">Niveau de maîtrise (%) *</Label>
+        <Input
+          id="percentage"
+          type="number"
+          min="0"
+          max="100"
+          value={formData.master_percentage}
+          onChange={(e) => setFormData({ ...formData, master_percentage: Number(e.target.value) })}
+          required
+          disabled={loading}
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4 b">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          className='bg-red-500 text-white hover:bg-gray-300'
+          disabled={loading}
+        >
           Annuler
         </Button>
-        <Button type="submit">
-          {isEditing ? 'Modifier' : 'Ajouter'}
+        <Button type="submit" className='bg-blue-500 text-white cursor-pointer' disabled={loading}>
+          {loading ? 'En cours...' : (initialData ? 'Modifier' : 'Ajouter')}
         </Button>
       </div>
     </form>

@@ -29,12 +29,12 @@ const Headers = () => {
                     YANIS TRIGLIA
                 </div>
 
-                <nav className="hidden md:flex space-x-8" >
+                <nav className="hidden md:flex space-x-8 " >
                     {['Accueil', 'À propos', 'Compétences', 'Diplômes', 'Expériences', 'Projets', 'Blog', 'Contact'].map((item, index) => (
                         <button
                             key={item}
                             onClick={() => scrollToSection(['hero', 'about', 'skills', 'education', 'experience', 'projects', 'blog', 'contact'][index])}
-                            className={`transition-colors ${headerOpaque ? 'text-black hover:text-blue-600' : 'text-white/70 hover:text-white'
+                            className={`transition-colors cursor-pointer ${headerOpaque ? 'text-black hover:text-blue-600' : 'text-white/70 hover:text-white'
                                 }`}
                         >
                             {item}
@@ -42,8 +42,8 @@ const Headers = () => {
                     ))}
                     {token && (
                         <div>
-                        <a href="/admin"><button className="ml-4 bg-blue-500 text-white p-2 rounded pointer-events-auto">Admin</button></a>
-                        <button onClick={logout} className="ml-4 bg-red-500 text-white p-2 rounded">Se déconnecter</button>
+                        <a href="/admin"><button className="ml-4 bg-blue-500 text-white p-2 rounded cursor-pointer">Admin</button></a>
+                        <button onClick={logout} className="ml-4 bg-red-500 text-white p-2 rounded cursor-pointer">Se déconnecter</button>
                         </div>
                     )}
                 </nav>

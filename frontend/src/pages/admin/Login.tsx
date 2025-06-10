@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../../components/ui/card';
-import { useToast } from '../../hook/use-toast';
+import { useToast } from '../../hooks/use-toast';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';

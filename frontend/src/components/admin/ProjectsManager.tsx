@@ -6,12 +6,12 @@ import { Textarea } from '../../components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
 import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Plus, Edit, Trash2, ExternalLink, Github, Hash, Upload, Image as X, ChevronsUpDown } from 'lucide-react';
+import { Plus, Edit, Trash2, ExternalLink, Github, Hash, Upload, Image as X, ChevronsUpDown, Check } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Badge } from '../ui/badge';
+import { useRef } from 'react';
 
 type Tag_table = {
   id: number;
@@ -50,6 +50,7 @@ const ProjectsManager = () => {
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Récupération des projets et tags
   const fetchData = useCallback(async () => {
@@ -76,6 +77,40 @@ const ProjectsManager = () => {
     fetchData();
   }, [fetchData]);
 
+
+  const filteredTags = useMemo(() => {
+    if (!searchQuery.trim()) return tags;
+
+    return tags.filter(tag =>
+      tag.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tag.categories.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  const removeTag = (tagId: number, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setSelectedTags(prev => prev.filter(id => id !== tagId));
+  };
+
+  const clearAllTags = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedTags([]);
+  };
+
+
+  const toggleTag = (tagId: number) => {
+    setSelectedTags(prev =>
+      prev.includes(tagId)
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+
   const resetForm = () => {
     setSelectedTags([]);
     setFile(null);
@@ -83,6 +118,9 @@ const ProjectsManager = () => {
     setError(null);
     setEditingProject(null);
   };
+
+
+
 
   // Gestion du drag & drop
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -129,25 +167,33 @@ const ProjectsManager = () => {
       setLoading(true);
       setError(null);
 
-      // Ici vous devrez implémenter l'upload du fichier vers votre backend
-      // Pour l'exemple, nous gardons juste l'URL de l'image existante
-      const imageUrl = editingProject?.images || '/placeholder.svg';
+      const formData = new FormData();
+      formData.append('name', (e.currentTarget.querySelector('#name') as HTMLInputElement).value);
+      formData.append('description', (e.currentTarget.querySelector('#description') as HTMLTextAreaElement).value);
+      formData.append('slug', (e.currentTarget.querySelector('#name') as HTMLInputElement).value.toLowerCase().replace(/\s+/g, '-'));
 
-      const projectData = {
-        name: (e.currentTarget.querySelector('#name') as HTMLInputElement).value,
-        description: (e.currentTarget.querySelector('#description') as HTMLTextAreaElement).value,
-        images: imageUrl,
-        link_project: (e.currentTarget.querySelector('#link_project') as HTMLInputElement).value,
-        github_project: (e.currentTarget.querySelector('#github_project') as HTMLInputElement).value,
-        tags: selectedTags
-      };
+      const linkProject = (e.currentTarget.querySelector('#link_project') as HTMLInputElement).value;
+      if (linkProject) formData.append('link_project', linkProject);
+
+      const githubProject = (e.currentTarget.querySelector('#github_project') as HTMLInputElement).value;
+      if (githubProject) formData.append('github_project', githubProject);
+
+      selectedTags.forEach(tagId => {
+        formData.append('tag[]', tagId.toString());
+      });
+
+      if (file) {
+        formData.append('image_url', file);
+      } else if (editingProject?.images) {
+        formData.append('images_url', editingProject.images);
+      }
 
       if (editingProject) {
-        console.log('Editing project:', editingProject);
-        //await api.post(`/project/${editingProject.id}`, projectData, token);
+
+        await api.putFormData(`/project/${editingProject.id}`, formData, token);
         toast({ title: "Projet modifié avec succès" });
       } else {
-        await api.post('/project', projectData, token);
+        await api.postFormData('/project', formData, token);
         toast({ title: "Projet ajouté avec succès" });
       }
 
@@ -249,48 +295,59 @@ const ProjectsManager = () => {
                 </div>
 
                 <div>
-                  <Label>Tags *</Label>
+                  <Label className="text-sm font-medium text-gray-700 mb-1 block">
+                    Sélectionner les tags *
+                  </Label>
+
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-
                       <Button
                         variant="outline"
                         role="combobox"
-                        aria-expanded={isDialogOpen}
-                        className="w-full justify-between border-2 border-white/20 bg-white/10 backdrop-blur-md hover:bg-white/20 hover:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl min-h-[40px] h-auto text-white"
+                        aria-expanded={open}
+                        className="w-full justify-between  bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 min-h-[42px] h-auto text-gray-900 font-normal"
                       >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-1 flex-1 min-w-0">
                             {selectedTags.length === 0 ? (
-                              <span className="truncate text-sm font-medium text-white/80">
-                                Filtrer par technologie
+                              <span className="text-gray-500 text-sm">
+                                Sélectionner des technologies...
                               </span>
-                            ) : selectedTags.length <= 2 ? (
-                              selectedTags.map((tag) => (
-                                <Badge
-                                  key={tag}
-                                  variant="secondary"
-                                  className="bg-white/20 text-white border-white/30 text-xs px-2 py-0.5 gap-1 backdrop-blur-sm"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))
+                            ) : selectedTags.length <= 3 ? (
+                              selectedTags.map((tagId) => {
+                                const tag = tags.find(t => t.id === tagId);
+                                if (!tag) return null;
+                                return (
+                                  <Badge
+                                    key={tag.id}
+                                    variant="secondary"
+                                    className="bg-blue-100 text-blue-800 border-blue-200 text-xs px-2 py-1 gap-1 hover:bg-blue-200"
+                                  >
+                                    <Hash className="h-2.5 w-2.5" />
+                                    {tag.name}
+                                    <button
+                                      type="button"
+                                      className="ml-1 hover:bg-blue-300 rounded-full p-0.5"
+                                      onClick={(e) => removeTag(tag.id, e)}
+                                    >
+                                      <X className="h-2.5 w-2.5" />
+                                    </button>
+                                  </Badge>
+                                );
+                              })
                             ) : (
                               <div className="flex items-center gap-2">
                                 <Badge
                                   variant="secondary"
-                                  className="bg-white/20 text-white border-white/30 text-xs px-2 py-0.5 backdrop-blur-sm"
+                                  className="bg-blue-100 text-blue-800 border-blue-200 text-xs px-2 py-1"
                                 >
-                                  {selectedTags.length} sélectionnées
+                                  {selectedTags.length} tags sélectionnés
                                 </Badge>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-5 w-5 p-0 hover:bg-red-500/20 text-white"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    setSelectedTags([])
-                                  }}
+                                  className="h-6 w-6 p-0 hover:bg-red-100 text-red-600"
+                                  onClick={clearAllTags}
                                 >
                                   <X className="h-3 w-3" />
                                 </Button>
@@ -298,62 +355,77 @@ const ProjectsManager = () => {
                             )}
                           </div>
                         </div>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-70 text-white" />
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-4 bg-white text-black border border-gray-200 shadow-lg rounded-md">
-                      <div className="space-y-2 max-h-60 overflow-y-auto">
-                        {tags.map(tag => {
-                          const isSelected = selectedTags.includes(tag.id);
-                          return (
-                            <div
-                              key={tag.id}
-                              onClick={() =>
-                                setSelectedTags(prev =>
-                                  isSelected
-                                    ? prev.filter(id => id !== tag.id)
-                                    : [...prev, tag.id]
-                                )
-                              }
-                              className={`cursor-pointer px-3 py-2 rounded-md flex justify-between items-center hover:bg-gray-100 transition ${isSelected ? 'bg-gray-100 font-medium' : ''
-                                }`}
-                            >
-                              <span>{tag.name}</span>
-                              {isSelected && (
-                                <span className="text-green-500 text-xs font-semibold">✔</span>
-                              )}
-                            </div>
-                          );
-                        })}
+
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-gray-200 shadow-lg">
+                      <div className="p-3 border-b border-gray-100">
+                        <Input
+                          placeholder="Rechercher un tag..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="h-9 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
                       </div>
+
+                      <div className="max-h-60 overflow-y-auto">
+                        {filteredTags.length === 0 ? (
+                          <div className="p-4 text-center text-gray-500 text-sm">
+                            Aucun tag trouvé
+                          </div>
+                        ) : (
+                          <div className="p-2 space-y-1">
+                            {filteredTags.map((tag) => {
+                              const isSelected = selectedTags.includes(tag.id);
+                              return (
+                                <div
+                                  key={tag.id}
+                                  onClick={() => toggleTag(tag.id)}
+                                  className={`cursor-pointer px-3 py-2 rounded-md flex items-center justify-between hover:bg-gray-100 transition-colors ${isSelected ? 'bg-blue-50 border border-blue-200' : ''
+                                    }`}
+                                >
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <Hash className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="text-sm font-medium text-gray-900 truncate">
+                                        {tag.name}
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {tag.categories} • {tag.master_percentage}%
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {isSelected && (
+                                    <Check className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedTags.length > 0 && (
+                        <div className="p-3 border-t border-gray-100 bg-gray-50">
+                          <div className="flex items-center justify-between text-xs text-gray-600">
+                            <span>{selectedTags.length} tag(s) sélectionné(s)</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 text-xs text-red-600 hover:bg-red-50"
+                              onClick={clearAllTags}
+                            >
+                              Tout effacer
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </PopoverContent>
-
-
                   </Popover>
-
-
-
-                  {/* <Select 
-                    value={selectedTags.join(',')} 
-                    onValueChange={(value) => setSelectedTags(value.split(',').map(Number))}
-                    
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez des tags">
-                        {selectedTags.length > 0 
-                          ? selectedTags.map(id => tags.find(t => t.id === id)?.name).join(', ')
-                          : "Sélectionnez des tags"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tags.map(tag => (
-                        <SelectItem key={tag.id} value={tag.id.toString()}>
-                          {tag.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select> */}
                 </div>
+
+
               </div>
 
               <div>
@@ -399,7 +471,7 @@ const ProjectsManager = () => {
                   {previewUrl ? (
                     <div className="relative">
                       <img
-                        src={previewUrl}
+                        src={previewUrl.startsWith('blob:') ? previewUrl : `http://127.0.0.1:8000/${previewUrl}`}
                         alt="Preview"
                         className="max-h-48 mx-auto rounded"
                       />
@@ -435,7 +507,7 @@ const ProjectsManager = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-blue-600 text-white" disabled={loading}>
                 {loading ? 'En cours...' : (editingProject ? 'Modifier' : 'Ajouter')}
               </Button>
             </form>
@@ -564,3 +636,21 @@ const ProjectsManager = () => {
 };
 
 export default ProjectsManager;
+function useMemo<T>(factory: () => T, deps: any[]): T {
+  const ref = useRef<{ deps: any[]; value: T } | undefined>(undefined);
+
+  if (!ref.current || !areDepsEqual(ref.current.deps, deps)) {
+    ref.current = { deps, value: factory() };
+  }
+
+  return ref.current.value;
+}
+
+function areDepsEqual(a: any[], b: any[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
