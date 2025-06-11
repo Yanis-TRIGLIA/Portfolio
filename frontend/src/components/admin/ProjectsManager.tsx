@@ -12,6 +12,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Badge } from '../ui/badge';
 import { useRef } from 'react';
+const { VITE_API_BASE } = import.meta.env;
 
 type Tag_table = {
   id: number;
@@ -471,7 +472,7 @@ const ProjectsManager = () => {
                   {previewUrl ? (
                     <div className="relative">
                       <img
-                        src={previewUrl.startsWith('blob:') ? previewUrl : `http://127.0.0.1:8000/${previewUrl}`}
+                        src={previewUrl.startsWith('blob:') ? previewUrl : `${VITE_API_BASE}${previewUrl}`}
                         alt="Preview"
                         className="max-h-48 mx-auto rounded"
                       />

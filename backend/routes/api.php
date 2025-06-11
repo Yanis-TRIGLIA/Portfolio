@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 
@@ -44,4 +46,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blog/{id}', [BlogController::class, 'update']);
     Route::delete('/blog/{id}', [BlogController::class, 'destroy']);
 
+});
+
+Route::post('/contact', [ContactController::class, 'send']);
+
+
+
+
+
+Route::get('/test-email', function() {
+    try {
+        Mail::raw('Ceci est un test', function($message) {
+            $message->to(env('MAIL_TO_ADDRESS'))
+                    ->subject('Test SMTP');
+        });
+        return 'Email envoyé!';
+    } catch (\Exception $e) {
+        return 'Erreur: ' . $e->getMessage();
+    }
 });

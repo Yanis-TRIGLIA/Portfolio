@@ -8,6 +8,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import AccessDenied from "../components/auth/AccessDenied";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import BlogDetail from "../pages/BlogDetail";
+import Sitemap from "../pages/Sitemap";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
   {
     path: "login",
     element: <Login />,
+  },
+  {
+    path: "plan_du_site",
+    element:<Sitemap/>,
   },
   {
     path: "project/:id",
@@ -41,4 +46,5 @@ export const router = createBrowserRouter([
     path: "access-denied",
     element: <AccessDenied />,
   },
+
 ]);

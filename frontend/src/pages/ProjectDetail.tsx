@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, Github } from 'lucide-react';
 import { api } from '../services/api';
 import { useEffect, useState } from 'react';
 import type { Project } from '../lib/type';
+const { VITE_API_BASE } = import.meta.env;
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -55,7 +56,7 @@ const ProjectDetail = () => {
           {/* Image réduite avec hauteur limitée */}
           <div className="h-64 md:h-80 overflow-hidden">
             <img
-              src={`http://127.0.0.1:8000/${project.images}`}
+              src={`${VITE_API_BASE}${project.images}`}
               alt={project.name}
               className="w-full h-full object-cover"
             />

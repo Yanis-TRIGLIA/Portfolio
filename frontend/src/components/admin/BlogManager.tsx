@@ -15,7 +15,7 @@ import { useToast } from '../../hooks/use-toast';
 import EditorJSComponent from '../form/EditorJSComponent';
 import type { OutputData } from '@editorjs/editorjs';
 import type { Blog, Tag } from '../../lib/type';
-
+const { VITE_API_BASE } = import.meta.env;
 
 const BlogManager = () => {
   const { token } = useAuth();
@@ -489,7 +489,7 @@ const BlogManager = () => {
                   {previewUrl ? (
                     <div className="relative">
                       <img
-                        src={previewUrl.startsWith('blob:') ? previewUrl : `http://127.0.0.1:8000/${previewUrl}`}
+                        src={previewUrl.startsWith('blob:') ? previewUrl : `${VITE_API_BASE}${previewUrl}`}
                         alt="Preview"
                         className="max-h-48 mx-auto rounded"
                       />

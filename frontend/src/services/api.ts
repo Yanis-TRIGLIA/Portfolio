@@ -1,4 +1,5 @@
-const API_BASE = 'http://127.0.0.1:8000/api';
+const VITE_API_BASE: string = import.meta.env.VITE_API_BASE;
+const API_BASE = `${VITE_API_BASE}api`;
 
 export const api = {
     async login(email: string, password: string) {

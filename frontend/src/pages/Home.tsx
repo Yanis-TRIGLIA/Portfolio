@@ -17,7 +17,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popove
 import { Command } from 'cmdk';
 import { Badge } from '../components/ui/badge';
 import { TerminalCard } from '../components/TerminalCard';
-
+import ReCAPTCHA from 'react-google-recaptcha';
+import CVSection from '../components/CVSection';
+const { VITE_API_BASE } = import.meta.env;
 
 
 
@@ -33,7 +35,7 @@ const Home = () => {
     const [showTitle, setShowTitle] = useState(false);
     const [showDesc, setShowDesc] = useState(false);
     const [closedProjects, setClosedProjects] = useState<Set<number>>(new Set());
-    
+
 
     const skillsRef = useRef<HTMLDivElement>(null);
     const timelineRef = useRef<HTMLDivElement>(null);
@@ -239,7 +241,82 @@ const Home = () => {
     const [offsetY, setOffsetY] = useState(0);
     function cn(...classes: (string | false | null | undefined)[]): string {
         return classes.filter(Boolean).join(' ');
-    } return (
+
+    }
+
+    ///mail
+
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+    });
+    const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<{
+        success: boolean;
+        message: string;
+    } | null>(null);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!captchaValue) {
+            setSubmitStatus({
+                success: false,
+                message: 'Veuillez compléter le CAPTCHA'
+            });
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitStatus(null);
+
+        try {
+            const response = await api.post('/contact', {
+                ...formData,
+                captcha: captchaValue
+            }, "");
+            console.log(response)
+
+            setSubmitStatus({
+                success: true,
+                message: 'Message envoyé avec succès!'
+            });
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                subject: '',
+                message: '',
+            });
+            setCaptchaValue(null);
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi:', error);
+            setSubmitStatus({
+                success: false,
+                message: 'Erreur lors de l\'envoi du message. Veuillez réessayer.'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+
+
+    return (
 
         <div className="min-h-screen">
 
@@ -467,7 +544,7 @@ const Home = () => {
                     <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Diplômes
                     </h2>
-               
+
 
                     <div className="relative max-w-4xl mx-auto">
                         <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
@@ -804,13 +881,18 @@ const Home = () => {
                                 id={project.id}
                                 title={project.name}
                                 description={project.description}
-                                image={`http://127.0.0.1:8000/${project.images}`}
+                                image={`${VITE_API_BASE}${project.images}`}
                                 tags={project.tag.map(tag => tag.name)}
                                 onClose={() => handleCloseProject(project.id)}
                             />
                         ))}
                     </div>
                 </div>
+            </section>
+
+            <section>
+
+                <CVSection></CVSection>
             </section>
 
             {/* Blog Section */}
@@ -832,7 +914,7 @@ const Home = () => {
                             >
                                 <div className="aspect-video overflow-hidden">
                                     <img
-                                        src={`http://127.0.0.1:8000/${post.cover}`}
+                                        src={`${VITE_API_BASE}${post.cover}`}
                                         alt={post.title}
                                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                     />
@@ -847,7 +929,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Contact & Footer */}
             <section id="contact" className="py-20 bg-gray-900 text-white">
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-12">
@@ -856,40 +937,101 @@ const Home = () => {
                             <div className="space-y-4 mb-8">
                                 <div className="flex items-center">
                                     <Mail className="mr-3 h-5 w-5 text-blue-400" />
-                                    <span>contact@julien-dupont.dev</span>
+                                    <span>yanistrigl@gmail.com</span>
                                 </div>
                                 <div className="flex items-center">
                                     <Phone className="mr-3 h-5 w-5 text-blue-400" />
-                                    <span>+33 6 12 34 56 78</span>
+                                    <span>+33 6 48 62 25 13</span>
                                 </div>
                                 <div className="flex items-center">
                                     <MapPin className="mr-3 h-5 w-5 text-blue-400" />
-                                    <span>Aix-en-Provence, France</span>
+                                    <span>Marignane, France</span>
                                 </div>
                             </div>
 
                             <div className="flex space-x-4">
-                                <Button variant="outline" size="icon" className="text-white border-white hover:bg-white hover:text-gray-900">
+                                <a href='https://github.com/Yanis-TRIGLIA'><Button variant="outline" size="icon" className="text-white border-white hover:bg-white hover:text-gray-900 cursor-pointer">
                                     <Github className="h-5 w-5" />
-                                </Button>
-                                <Button variant="outline" size="icon" className="text-white border-white hover:bg-white hover:text-gray-900">
+                                </Button></a>
+                                <a href='https://www.linkedin.com/in/yanis-triglia-4a5125237/'><Button variant="outline" size="icon" className="cursor-pointer text-white border-white hover:bg-white hover:text-gray-900">
                                     <Linkedin className="h-5 w-5" />
-                                </Button>
+                                </Button></a>
                             </div>
                         </div>
 
                         <div>
-                            <form className="space-y-6">
+                            <form className="space-y-6" onSubmit={handleSubmit}>
+                                {submitStatus && (
+                                    <div className={`p-4 rounded-md ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                        {submitStatus.message}
+                                    </div>
+                                )}
+
                                 <div className="grid md:grid-cols-2 gap-4">
-                                    <Input placeholder="Nom *" className="bg-gray-800 border-gray-700 text-white" />
-                                    <Input placeholder="Prénom" className="bg-gray-800 border-gray-700 text-white" />
+                                    <Input
+                                        name="firstName"
+                                        placeholder="Prénom *"
+                                        className="bg-gray-800 border-gray-700 text-white"
+                                        value={formData.firstName}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    <Input
+                                        name="lastName"
+                                        placeholder="Nom *"
+                                        className="bg-gray-800 border-gray-700 text-white"
+                                        value={formData.lastName}
+                                        onChange={handleChange}
+                                        required
+                                    />
                                 </div>
-                                <Input placeholder="E-mail *" type="email" className="bg-gray-800 border-gray-700 text-white" />
-                                <Input placeholder="Téléphone" className="bg-gray-800 border-gray-700 text-white" />
-                                <Input placeholder="Objet *" className="bg-gray-800 border-gray-700 text-white" />
-                                <Textarea placeholder="Message *" className="bg-gray-800 border-gray-700 text-white min-h-32" />
-                                <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                                    Envoyer
+                                <Input
+                                    name="email"
+                                    placeholder="E-mail *"
+                                    type="email"
+                                    className="bg-gray-800 border-gray-700 text-white"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Input
+                                    name="phone"
+                                    placeholder="Téléphone"
+                                    className="bg-gray-800 border-gray-700 text-white"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                />
+                                <Input
+                                    name="subject"
+                                    placeholder="Objet *"
+                                    className="bg-gray-800 border-gray-700 text-white"
+                                    value={formData.subject}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Textarea
+                                    name="message"
+                                    placeholder="Message *"
+                                    className="bg-gray-800 border-gray-700 text-white min-h-32"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    required
+                                />
+
+                                <div className="my-4 place-items-center">
+                                    <ReCAPTCHA
+                                        
+                                        sitekey="6LdT-VwrAAAAAFUOgONis73rIwxXkShW3Y2s3l60"
+                                        onChange={(value) => setCaptchaValue(value)}
+                                    />
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer'}
                                 </Button>
                             </form>
                         </div>
@@ -898,10 +1040,10 @@ const Home = () => {
                     <div className="border-t border-gray-700 mt-12 pt-8">
                         <div className="flex flex-col md:flex-row justify-between items-center">
                             <p className="text-gray-400 mb-4 md:mb-0">
-                                © 2025 Julien Dupont – Tous droits réservés
+                                © 2025 Yanis Triglia – Tous droits réservés
                             </p>
                             <div className="flex space-x-6 text-sm text-gray-400">
-                                <a href="/sitemap" className="hover:text-white transition-colors">Plan du site</a>
+                                <a href="/plan_du_site" className="hover:text-white transition-colors">Plan du site</a>
                                 <a href="/mentions-legales" className="hover:text-white transition-colors">Mentions légales</a>
                                 <a href="/politique-confidentialite" className="hover:text-white transition-colors">Politique de confidentialité</a>
                             </div>

@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 import type { Blog } from '../lib/type';
 import { api } from '../services/api';
+const { VITE_API_BASE } = import.meta.env;
 
 type EditorJSData = {
   time: number;
@@ -161,16 +162,16 @@ const BlogDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 ">
         <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Retour au portfolio
         </Link>
 
         <article className="bg-white rounded-lg overflow-hidden shadow-lg">
-          <div className="aspect-video overflow-hidden">
+          <div className="aspect-video overflow-hidden w-full h-80">
             <img 
-              src={`http://127.0.0.1:8000/${post.cover}`}
+              src={`${VITE_API_BASE}${post.cover}`}
               alt={post.title}
               className="w-full h-full object-cover"
             />
