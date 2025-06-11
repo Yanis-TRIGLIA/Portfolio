@@ -15,6 +15,7 @@ class Blog extends Model
         'slug', 
         'content', 
         'cover', 
+        'read_time',
         'meta_title', 
         'meta_description'
     ];

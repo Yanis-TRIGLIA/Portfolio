@@ -30,7 +30,8 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'required|json',
+            'read_time' => 'required|integer|min:1',
             'cover' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'required|array',
             'tag.*' => 'exists:tags,id',
@@ -62,6 +63,25 @@ class BlogController extends Controller
     }
 
 
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $image = $request->file('image');
+        $filename = 'blog_images/' . uniqid() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('storage/blog_images'), $filename);
+
+        return response()->json([
+            'success' => 1,
+            'file' => [
+                'url' => asset('storage/' . $filename),
+            ],
+        ]);
+    }
+
+
 
     public function update(Request $request, $id)
     {
@@ -71,7 +91,8 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'string|max:255',
             'slug' => 'string|max:255',
-            'content' => 'string',
+            'content' => 'json',
+            'read_time' => 'integer|min:1',
             'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'array',
             'tag.*' => 'exists:tags,id',

@@ -7,6 +7,9 @@ export type Blog_table = {
   content: string;
   meta_title: string;
   meta_description: string;
+  tag: Tag_table[];
+  read_time: number;
+
   
 };
 

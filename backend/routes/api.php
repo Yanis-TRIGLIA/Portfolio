@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/{id}', [BlogController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/blog/upload-image', [BlogController::class, 'uploadImage']);
     Route::post('/blog', [BlogController::class, 'store']);
     Route::post('/blog/{id}', [BlogController::class, 'update']);
     Route::delete('/blog/{id}', [BlogController::class, 'destroy']);

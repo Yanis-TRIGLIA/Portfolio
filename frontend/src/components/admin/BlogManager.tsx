@@ -12,34 +12,18 @@ import { useAuth } from '../../context/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Badge } from '../ui/badge';
 import { useToast } from '../../hooks/use-toast';
+import EditorJSComponent from '../form/EditorJSComponent';
+import type { OutputData } from '@editorjs/editorjs';
+import type { Blog, Tag } from '../../lib/type';
 
-type Tag_table = {
-  id: number;
-  categories: string;
-  name: string;
-  master_percentage: number;
-};
-
-type BlogPost = {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  cover: string;
-  meta_title: string;
-  meta_description: string;
-  created_at: string;
-  updated_at: string;
-  tag: Tag_table[];
-};
 
 const BlogManager = () => {
   const { token } = useAuth();
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [tags, setTags] = useState<Tag_table[]>([]);
+  const [posts, setPosts] = useState<Blog[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [editingPost, setEditingPost] = useState<Blog | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -48,15 +32,35 @@ const BlogManager = () => {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Récupération des articles et tags
+  const [editorData, setEditorData] = useState<OutputData | undefined>(undefined);
+
+
+  useEffect(() => {
+    if (editingPost?.content) {
+      try {
+        const parsed = typeof editingPost.content === 'string'
+          ? JSON.parse(editingPost.content)
+          : editingPost.content;
+
+        setEditorData(parsed);
+      } catch (err) {
+        console.error('Erreur parsing contenu:', err);
+        setEditorData(undefined); 
+      }
+    } else {
+      setEditorData(undefined);
+    }
+  }, [editingPost]);
+
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
       const [postsResponse, tagsResponse] = await Promise.all([
-        api.get<BlogPost[]>('/blog', null),
-        api.get<Tag_table[]>('/tag', null)
+        api.get<Blog[]>('/blog', null),
+        api.get<Tag[]>('/tag', null)
       ]);
 
       setPosts(postsResponse);
@@ -148,7 +152,7 @@ const BlogManager = () => {
     e.preventDefault();
 
     if (!token) {
-      setError('Token d\'authentification manquant');
+      setError(token ? 'Veuillez remplir le contenu' : 'Token d\'authentification manquant');
       return;
     }
 
@@ -158,28 +162,31 @@ const BlogManager = () => {
 
       const formData = new FormData();
       formData.append('title', (e.currentTarget.querySelector('#title') as HTMLInputElement).value);
-      formData.append('content', (e.currentTarget.querySelector('#content') as HTMLTextAreaElement).value);
+      formData.append('content', JSON.stringify(editorData));
+      formData.append('read_time', (e.currentTarget.querySelector('#read_time') as HTMLInputElement).value || '1');
       formData.append('slug', (e.currentTarget.querySelector('#title') as HTMLInputElement).value.toLowerCase().replace(/\s+/g, '-'));
       formData.append('meta_title', (e.currentTarget.querySelector('#meta_title') as HTMLInputElement).value);
       formData.append('meta_description', (e.currentTarget.querySelector('#meta_description') as HTMLTextAreaElement).value);
 
-      // Ajouter les tags
       selectedTags.forEach(tagId => {
         formData.append('tag[]', tagId.toString());
       });
 
-      // Ajouter l'image si elle existe
       if (file) {
         formData.append('cover', file);
       } else if (editingPost?.cover) {
-        // Si en mode édition et pas de nouvelle image, utiliser l'image existante
         formData.append('cover_url', editingPost.cover);
       }
+
+
 
       if (editingPost) {
         await api.putFormData(`/blog/${editingPost.id}`, formData, token);
         toast({ title: "Article modifié avec succès" });
       } else {
+        for (let [key, value] of formData.entries()) {
+          console.log(key, value);
+        }
         await api.postFormData('/blog', formData, token);
         toast({ title: "Article ajouté avec succès" });
       }
@@ -199,7 +206,7 @@ const BlogManager = () => {
     }
   };
 
-  const handleEdit = (post: BlogPost) => {
+  const handleEdit = (post: Blog) => {
     setEditingPost(post);
     setSelectedTags(post.tag.map(t => t.id));
     setPreviewUrl(post.cover);
@@ -234,6 +241,22 @@ const BlogManager = () => {
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
+
+  const handleImageUpload = async (file: File) => {
+    if (!token) {
+      throw new Error("Token d'authentification manquant");
+    }
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await api.postFormData('/blog/upload-image', formData, token);
+      return (response as { file: { url: string } }).file.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
   return (
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
@@ -249,7 +272,7 @@ const BlogManager = () => {
               Nouvel Article
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-6xl overflow-auto  scrollable-dialog">
             <DialogHeader>
               <DialogTitle>
                 {editingPost ? 'Modifier l\'Article' : 'Nouvel Article'}
@@ -268,25 +291,41 @@ const BlogManager = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="title">Titre *</Label>
-                <Input
-                  id="title"
-                  defaultValue={editingPost?.title || ''}
-                  required
-                  disabled={loading}
-                />
+
+
+
+              <div className='flex space-x-5'>
+                <div className='w-1/2'>
+                  <Label htmlFor="title">Titre *</Label>
+                  <Input
+                    id="title"
+                    defaultValue={editingPost?.title || ''}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className='w-1/2'>
+                  <Label htmlFor="read_time">Temps de Lecture *</Label>
+                  <Input
+                    id="read_time"
+                    type='number'
+                    defaultValue={editingPost?.read_time || ''}
+                    required
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
               <div>
                 <Label htmlFor="content">Contenu *</Label>
-                <Textarea
-                  id="content"
-                  defaultValue={editingPost?.content || ''}
-                  required
-                  disabled={loading}
-                  rows={6}
+
+                <EditorJSComponent
+                  value={editorData}
+                  onChange={(data) => setEditorData(data)}
+                  onImageUpload={handleImageUpload}
                 />
+
+
               </div>
 
               <div className="grid grid-cols-2 gap-4">

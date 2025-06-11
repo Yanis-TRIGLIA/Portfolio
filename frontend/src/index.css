@@ -127,3 +127,12 @@
     content: "-";
     color: white;
 }
+
+.scrollable-dialog {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+h1, h2{
+  font-family: 'Playfair Display', serif;
+}
