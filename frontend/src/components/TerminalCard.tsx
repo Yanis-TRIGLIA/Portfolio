@@ -42,8 +42,8 @@ export const TerminalCard: React.FC<TerminalCardProps> = ({
   };
 
   return (
-    <div className={`bg-gray-900 rounded-lg shadow-2xl overflow-hidden transition-all duration-300 ${
-      isMinimized ? 'h-12 hover:h-auto' : isMaximized ? 'fixed inset-4 z-50 h-auto' : 'transform hover:scale-105'
+    <div className={`bg-gray-900 rounded-lg shadow-2xl overflow-hidden  ${
+      isMinimized ? 'h-12 hover:h-auto' : isMaximized ? 'fixed inset-4 z-50 h-auto' : 'transform '
     }`}>
       {/* Terminal Header */}
       <div className="bg-gray-800 px-4 py-3 flex items-center gap-2">
@@ -120,7 +120,7 @@ export const TerminalCard: React.FC<TerminalCardProps> = ({
           </div>
           
           <div className="mt-2 text-xs text-gray-500 text-center">
-            Cliquez pour voir les détails du projet
+            💡 Cliquez pour voir les détails du projet
           </div>
         </div>
       )}

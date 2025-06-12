@@ -7,18 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Progress } from '../components/ui/progress';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
-import { Mail, Phone, MapPin, Github, Linkedin, ExternalLink, Calendar, Building, GraduationCap, Code, BookOpen, CheckCircle, Users, Lightbulb, Heart, Camera, Plane, Clock, Award, Briefcase, Check, ChevronsUpDown, Search, X } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, ExternalLink, Calendar, Building, GraduationCap, Code, BookOpen, CheckCircle, Users, Lightbulb, Heart, Camera, Plane, Clock, Award, Briefcase } from 'lucide-react';
 import { GeometricCanvas } from '../components/GeometricCanvas';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import Typewriter from '../components/text/Typewritter';
 import { api } from '../services/api';
-import type { Blog, Project, Tag } from '../lib/type';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
-import { Command } from 'cmdk';
-import { Badge } from '../components/ui/badge';
-import { TerminalCard } from '../components/TerminalCard';
+import type { Blog, Tag } from '../lib/type';
 import ReCAPTCHA from 'react-google-recaptcha';
 import CVSection from '../components/CVSection';
+import ProjectsSection from '../components/ProjectsSection';
+import MapSection from './MapSection';
 const { VITE_API_BASE } = import.meta.env;
 
 
@@ -26,15 +24,11 @@ const { VITE_API_BASE } = import.meta.env;
 const Home = () => {
 
 
-    const [selectedTag, setSelectedTag] = useState(["Tout les projets"]);
     const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
     const [tag, setTag] = useState<Tag[]>([]);
     const [blog, setBlog] = useState<Blog[]>([]);
-    const [open, setOpen] = useState(false)
-    const [projects, setProject] = useState<Project[]>([]);
     const [showTitle, setShowTitle] = useState(false);
     const [showDesc, setShowDesc] = useState(false);
-    const [closedProjects, setClosedProjects] = useState<Set<number>>(new Set());
 
 
     const skillsRef = useRef<HTMLDivElement>(null);
@@ -53,10 +47,6 @@ const Home = () => {
         setTimeout(() => {
             setShowDesc(true);
         }, 500);
-    };
-
-    const handleCloseProject = (projectId: number) => {
-        setClosedProjects(prev => new Set([...prev, projectId]));
     };
 
     useIntersectionObserver(skillsRef as RefObject<Element>, (isVisible) => {
@@ -129,14 +119,7 @@ const Home = () => {
             console.error('Erreur lors de la récupération des posts:', error);
         }
     };
-    const getallprojects = async () => {
-        try {
-            const response = await api.get('/project', null);
-            setProject(response as Project[]);
-        } catch (error) {
-            console.error('Erreur lors de la récupération des projets:', error);
-        }
-    }
+
     const getallblog = async () => {
         try {
             const response = await api.get('/blog', null);
@@ -152,7 +135,6 @@ const Home = () => {
 
     useEffect(() => {
         getallstats();
-        getallprojects();
         getallblog();
         const handleScroll = () => {
             if (bgRef.current) {
@@ -210,39 +192,24 @@ const Home = () => {
 
 
 
-    const filteredProjects = selectedTag && selectedTag.length > 0
-        //on exlue closedProjects
-        ? projects.filter(project => {
-            const projectTags = project.tag.map(tag => tag.name);
-            return selectedTag.includes("Tout les projets") || selectedTag.some(tag => projectTags.includes(tag));
-        }).filter(project => !closedProjects.has(project.id))
-        : projects.filter(project => !closedProjects.has(project.id));
-
-    interface HandleSelectEvent {
-        (value: string): void;
-    }
-
-    const handleSelect: HandleSelectEvent = (value) => {
-        if (value === "all") {
-            setSelectedTag([])
-            return
-        }
-
-        const newSelectedTags = selectedTag.includes(value)
-            ? selectedTag.filter((tag: string) => tag !== value)
-            : [...selectedTag, value]
-
-        setSelectedTag(newSelectedTags)
-    }
-
-
-    const availableTags = [tag.map(item => item.name), "Tout les projets"].flat().filter((value, index, self) => self.indexOf(value) === index);
     const bgRef = useRef<HTMLDivElement>(null);
     const [offsetY, setOffsetY] = useState(0);
     function cn(...classes: (string | false | null | undefined)[]): string {
         return classes.filter(Boolean).join(' ');
 
     }
+
+    const handleSectionVisibilityChange = (section: string, isVisible: boolean) => {
+        setVisibleSections(prev => {
+            const newSet = new Set(prev);
+            if (isVisible) {
+                newSet.add(section);
+            } else {
+                newSet.delete(section);
+            }
+            return newSet;
+        });
+    };
 
     ///mail
 
@@ -376,7 +343,7 @@ const Home = () => {
                     <div className="grid md:grid-cols-2 gap-16 items-start">
                         <div className="flex justify-start space-x-2">
                             <img
-                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
+                                src="https://www.einerd.com/wp-content/uploads/2017/10/dragonballsuper-transforma%C3%A7%C3%A3oGokucapa-890x606.jpg"
                                 alt="Portrait"
                                 className="w-52 h-52 rounded-full object-cover shadow-lg"
                             />
@@ -618,63 +585,83 @@ const Home = () => {
             </section>
 
 
-            <section id="experience" className="py-20" ref={experiencesRef}>
+            <section id="experience" className="py-20 overflow-x-hidden" ref={experiencesRef}>
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Expériences
                     </h2>
+
                     <div className="space-y-8">
-                        <Card className={`p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
-                            <div className="grid md:grid-cols-3 gap-6">
+
+                        <Card
+                            className={`p-6 sm:p-8 border-l-4 border-yellow-400/45 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+                                }`}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">
                                         <Calendar className="mr-2 h-5 w-5 text-blue-600" />
-                                        <span className="text-blue-600 font-bold">2024 – Actuellement</span>
+                                        <span className="text-blue-600 font-bold text-sm sm:text-base">2024 – Actuellement</span>
                                     </div>
                                     <div className="flex items-center">
                                         <Building className="mr-2 h-5 w-5 text-gray-600" />
-                                        <span className="font-medium text-gray-800">La Ligne Web</span>
+                                        <span className="font-medium text-gray-800 text-sm sm:text-base">La Ligne Web</span>
                                     </div>
                                     <div className="flex items-start">
                                         <MapPin className="mr-2 h-4 w-4 text-gray-600 mt-1 flex-shrink-0" />
-                                        <span className="text-gray-600 text-sm">1140 Rue André Ampère, Aix-en-Provence</span>
+                                        <span className="text-gray-600 text-sm">
+                                            1140 Rue André Ampère, Aix-en-Provence
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="md:col-span-2">
                                     <div className="flex items-center mb-4">
                                         <Briefcase className="mr-2 h-5 w-5 text-blue-600" />
-                                        <h3 className="text-xl font-bold text-gray-800">Stage de développement Front-End React</h3>
+                                        <h3 className="text-lg sm:text-xl font-bold text-gray-800">
+                                            Alternace Management d'architecture et d'application logicielles
+                                        </h3>
                                     </div>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        Développement d'interfaces utilisateur modernes et responsives en utilisant React et TypeScript.
-                                        Collaboration avec l'équipe de design pour implémenter des solutions créatives et optimisées.
+                                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                                        Développement de site web via des framework tels que Laravel , mise en place de stratégie d'architecture via certain projet .
+                                        approfidisssement du travail d'équipe et surtout du travail en autonomie
                                     </p>
                                 </div>
                             </div>
                         </Card>
-
-                        <Card className={`p-8 border-l-4 border-green-500 transition-all duration-1000 delay-300 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
-                            <div className="grid md:grid-cols-3 gap-6">
+                        <Card
+                            className={`p-6 sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+                                }`}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">
-                                        <Calendar className="mr-2 h-5 w-5 text-green-600" />
-                                        <span className="text-green-600 font-bold">2023</span>
+                                        <Calendar className="mr-2 h-5 w-5 text-blue-600" />
+                                        <span className="text-blue-600 font-bold text-sm sm:text-base">2024</span>
                                     </div>
                                     <div className="flex items-center">
                                         <Building className="mr-2 h-5 w-5 text-gray-600" />
-                                        <span className="font-medium text-gray-800">Alithya</span>
+                                        <span className="font-medium text-gray-800 text-sm sm:text-base">La Ligne Web</span>
                                     </div>
                                     <div className="flex items-start">
                                         <MapPin className="mr-2 h-4 w-4 text-gray-600 mt-1 flex-shrink-0" />
-                                        <span className="text-gray-600 text-sm">25 Rue de la Petite Duranne, Aix-en-Provence</span>
+                                        <span className="text-gray-600 text-sm">
+                                            1140 Rue André Ampère, Aix-en-Provence
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="md:col-span-2">
                                     <div className="flex items-center mb-4">
-                                        <Briefcase className="mr-2 h-5 w-5 text-green-600" />
-                                        <h3 className="text-xl font-bold text-gray-800">Stage de développement Full Stack</h3>
+                                        <Briefcase className="mr-2 h-5 w-5 text-blue-600" />
+                                        <h3 className="text-lg sm:text-xl font-bold text-gray-800">
+                                            Stage de développement Front-End React
+                                        </h3>
                                     </div>
-                                    <div className="space-y-3 text-gray-600">
+                                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                                        Développement d'interfaces utilisateur modernes et responsives en utilisant React et TypeScript.
+                                        Collaboration avec l'équipe de design pour implémenter des solutions créatives et optimisées.
+                                    </p>
+
+                                    <div className="space-y-2 text-gray-600 text-sm sm:text-base mt-8">
                                         <p>• Création d'une application from scratch ressemblant à un réseau professionnel (type LinkedIn)</p>
                                         <p>• Développement en mode agile (méthode SCRUM)</p>
                                         <p>• Front-End : React + TypeScript</p>
@@ -682,8 +669,62 @@ const Home = () => {
                                         <p>• Participation à la maintenance évolutive des applications du CSN</p>
                                         <p>• Technologies : Java, Spring Boot, PostgreSQL, Angular + TypeScript</p>
                                     </div>
+
+                                        <div className="mt-4">
+                                        <a
+                                            href="https://dringgo.fr/"
+                                            className="text-blue-600 hover:underline flex items-center text-sm"
+                                        >
+                                            <ExternalLink className="mr-1 h-4 w-4" />
+                                            Voir le projet Dringgo (Réseau d'entreprise)
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+
+                        <Card
+                            className={`p-6 sm:p-8 border-l-4 border-green-500 transition-all duration-1000 delay-300 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
+                                }`}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                                <div className="space-y-4">
+                                    <div className="flex items-center">
+                                        <Calendar className="mr-2 h-5 w-5 text-green-600" />
+                                        <span className="text-green-600 font-bold text-sm sm:text-base">2023</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Building className="mr-2 h-5 w-5 text-gray-600" />
+                                        <span className="font-medium text-gray-800 text-sm sm:text-base">Alithya</span>
+                                    </div>
+                                    <div className="flex items-start">
+                                        <MapPin className="mr-2 h-4 w-4 text-gray-600 mt-1 flex-shrink-0" />
+                                        <span className="text-gray-600 text-sm">
+                                            25 Rue de la Petite Duranne, Aix-en-Provence
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <div className="flex items-center mb-4">
+                                        <Briefcase className="mr-2 h-5 w-5 text-green-600" />
+                                        <h3 className="text-lg sm:text-xl font-bold text-gray-800">
+                                            Stage de développement Full Stack
+                                        </h3>
+                                    </div>
+                                    <div className="space-y-2 text-gray-600 text-sm sm:text-base">
+                                        <p>• Participation à la maintenance évolutive des applications du
+                                            Centre de Solutions Numérique (CSN) , pour des clients dans le
+                                            domaine du Sport et sur des projets internes à Alithya.</p>
+                                        <p>• Les technologies utilisées étaient Java, Spring Boot, PostgreSQL
+                                            pour le back-end et côté front-end Angular et TypeScript.</p>
+                                        <p>• Apprentissage poussé à l’autonomie avec des tâches full-stack
+                                            fournies depuis des backlogs (différents selon les sprints).</p>
+                                    </div>
                                     <div className="mt-4">
-                                        <a href="https://eden.fftir.org/" className="text-blue-600 hover:underline flex items-center">
+                                        <a
+                                            href="https://eden.fftir.org/"
+                                            className="text-blue-600 hover:underline flex items-center text-sm"
+                                        >
                                             <ExternalLink className="mr-1 h-4 w-4" />
                                             Voir le projet EDEN (Fédération Française de Tir)
                                         </a>
@@ -695,201 +736,11 @@ const Home = () => {
                 </div>
             </section>
 
-            <section id="projects" className="py-20 relative overflow-hidden" ref={projectsRef}>
-                <div className="absolute inset-0 w-full h-full">
-                    <video
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        poster=""
-                    >
-                        <source src="/video/code.mp4" type="video/mp4" />
-                        Votre navigateur ne supporte pas les vidéos HTML5.
-                    </video>
 
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
-
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20"></div>
-                </div>
-
-                <div className="container mx-auto px-4 relative z-10">
-                    <h2 className="text-3xl font-bold mb-12 font-serif text-white leading-tight categories_white drop-shadow-lg">
-                        Projets
-                    </h2>
-
-                    <div className="mb-8 flex justify-center">
-                        <div className="w-full max-w-md">
-                            <Popover open={open} onOpenChange={setOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        role="combobox"
-                                        aria-expanded={open}
-                                        className="w-full justify-between border-2 border-white/20 bg-white/10 backdrop-blur-md hover:bg-white/20 hover:border-white/30 transition-all duration-200 shadow-lg hover:shadow-xl min-h-[40px] h-auto text-white"
-                                    >
-                                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                                            <div className="flex flex-wrap items-center gap-1 flex-1 min-w-0">
-                                                {selectedTag.length === 0 ? (
-                                                    <span className="truncate text-sm font-medium text-white/80">
-                                                        Filtrer par technologie
-                                                    </span>
-                                                ) : selectedTag.length <= 2 ? (
-                                                    selectedTag.map((tag) => (
-                                                        <Badge
-                                                            key={tag}
-                                                            variant="secondary"
-                                                            className="bg-white/20 text-white border-white/30 text-xs px-2 py-0.5 gap-1 backdrop-blur-sm"
-                                                        >
-                                                            {tag}
-                                                        </Badge>
-                                                    ))
-                                                ) : (
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge
-                                                            variant="secondary"
-                                                            className="bg-white/20 text-white border-white/30 text-xs px-2 py-0.5 backdrop-blur-sm"
-                                                        >
-                                                            {selectedTag.length} sélectionnées
-                                                        </Badge>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-5 w-5 p-0 hover:bg-red-500/20 text-white"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                setSelectedTag([])
-                                                            }}
-                                                        >
-                                                            <X className="h-3 w-3" />
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-70 text-white" />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 border-2 border-white/20 shadow-2xl bg-black/80 backdrop-blur-xl">
-                                    <Command className="rounded-lg">
-                                        <div className="flex items-center px-3 py-2 border-b border-white/20">
-                                            <Search className="mr-2 h-4 w-4 shrink-0 text-white/60" />
-                                            <Command.Input
-                                                placeholder="Rechercher une technologie..."
-                                                className="flex-1 bg-transparent border-0 outline-none placeholder:text-white/60 text-sm text-white"
-                                            />
-                                        </div>
-
-                                        {selectedTag.length > 0 && (
-                                            <div className="px-3 py-2 border-b border-white/10 bg-white/5">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs text-white/60">
-                                                        {selectedTag.length} technologie{selectedTag.length > 1 ? 's' : ''} sélectionnée{selectedTag.length > 1 ? 's' : ''}
-                                                    </span>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 px-2 text-xs hover:bg-red-500/20 hover:text-red-300 text-white/80"
-                                                        onClick={() => setSelectedTag([])}
-                                                    >
-                                                        Tout effacer
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <Command.List className="max-h-[300px] overflow-y-auto">
-                                            <Command.Empty className="py-6 text-center text-sm text-white/60">
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <Search className="h-8 w-8 opacity-40" />
-                                                    <span>Aucune technologie trouvée</span>
-                                                </div>
-                                            </Command.Empty>
-                                            <Command.Group className="p-2">
-                                                <Command.Item
-                                                    value="all"
-                                                    onSelect={() => handleSelect("all")}
-                                                    className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 cursor-pointer transition-colors duration-150 text-white"
-                                                >
-                                                    <div className="flex items-center justify-center w-5 h-5">
-                                                        <Check
-                                                            className={cn(
-                                                                "h-4 w-4 transition-opacity duration-200 text-blue-400",
-                                                                selectedTag.length === 0 ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                    </div>
-                                                    <div className="flex items-center gap-2 flex-1">
-                                                        <span className="text-sm font-medium">Tous les projets</span>
-                                                        {selectedTag.length === 0 && (
-                                                            <Badge variant="outline" className="text-xs border-blue-400/50 text-blue-300 bg-blue-500/10">
-                                                                Actuel
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </Command.Item>
-
-                                                {availableTags
-                                                    .filter(tag => tag && tag !== "null" && tag !== "undefined")
-                                                    .slice(0, 15)
-                                                    .map(tag => {
-                                                        const isSelected = selectedTag.includes(tag)
-                                                        return (
-                                                            <Command.Item
-                                                                key={String(tag)}
-                                                                value={String(tag)}
-                                                                onSelect={() => handleSelect(String(tag))}
-                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-white/10 cursor-pointer transition-colors duration-150 text-white"
-                                                            >
-                                                                <div className="flex items-center justify-center w-5 h-5">
-                                                                    <Check
-                                                                        className={cn(
-                                                                            "h-4 w-4 transition-opacity duration-200",
-                                                                            isSelected ? "opacity-100 text-blue-400" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </div>
-                                                                <div className="flex items-center gap-2 flex-1">
-                                                                    <span className={cn(
-                                                                        "text-sm font-medium",
-                                                                        isSelected && "text-blue-300"
-                                                                    )}>
-                                                                        {tag}
-                                                                    </span>
-                                                                    {isSelected && (
-                                                                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-300 border-blue-400/50">
-                                                                            Sélectionné
-                                                                        </Badge>
-                                                                    )}
-                                                                </div>
-                                                            </Command.Item>
-                                                        )
-                                                    })}
-                                            </Command.Group>
-                                        </Command.List>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredProjects.map((project) => (
-                            <TerminalCard
-                                key={project.id}
-                                id={project.id}
-                                title={project.name}
-                                description={project.description}
-                                image={`${VITE_API_BASE}${project.images}`}
-                                tags={project.tag.map(tag => tag.name)}
-                                onClose={() => handleCloseProject(project.id)}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
+            <ProjectsSection
+                visibleSections={visibleSections}
+                onSectionVisibilityChange={handleSectionVisibilityChange}
+            />
             <section>
 
                 <CVSection></CVSection>
@@ -929,6 +780,11 @@ const Home = () => {
                 </div>
             </section>
 
+            <MapSection
+                visibleSections={visibleSections}
+                onSectionVisibilityChange={handleSectionVisibilityChange}
+            />
+
             <section id="contact" className="py-20 bg-gray-900 text-white">
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-12">
@@ -937,11 +793,21 @@ const Home = () => {
                             <div className="space-y-4 mb-8">
                                 <div className="flex items-center">
                                     <Mail className="mr-3 h-5 w-5 text-blue-400" />
-                                    <span>yanistrigl@gmail.com</span>
+                                    <a
+                                        href="mailto:yanistrigl@gmail.com"
+                                        className="hover:underline focus:outline-none"
+                                    >
+                                        yanistrigl@gmail.com
+                                    </a>
                                 </div>
                                 <div className="flex items-center">
                                     <Phone className="mr-3 h-5 w-5 text-blue-400" />
-                                    <span>+33 6 48 62 25 13</span>
+                                    <a
+                                        href="tel:+33648622513"
+                                        className="hover:underline focus:outline-none"
+                                    >
+                                        +33 6 48 62 25 13
+                                    </a>
                                 </div>
                                 <div className="flex items-center">
                                     <MapPin className="mr-3 h-5 w-5 text-blue-400" />
@@ -1020,7 +886,7 @@ const Home = () => {
 
                                 <div className="my-4 place-items-center">
                                     <ReCAPTCHA
-                                        
+
                                         sitekey="6LdT-VwrAAAAAFUOgONis73rIwxXkShW3Y2s3l60"
                                         onChange={(value) => setCaptchaValue(value)}
                                     />

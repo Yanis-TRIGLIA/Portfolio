@@ -9,14 +9,7 @@ const Sitemap = () => {
       title: "Pages principales",
       icon: <Home className="h-5 w-5" />,
       links: [
-        { name: "Accueil", url: "/", description: "Page d'accueil du portfolio" },
-        { name: "À propos", url: "/#about", description: "Présentation personnelle et informations" },
-        { name: "Compétences", url: "/#skills", description: "Technologies et compétences techniques" },
-        { name: "Expériences", url: "/#experience", description: "Parcours professionnel" },
-        { name: "Formation", url: "/#education", description: "Diplômes et formations" },
-        { name: "Projets", url: "/#projects", description: "Réalisations et projets développés" },
-        { name: "Blog", url: "/#blog", description: "Articles et actualités techniques" },
-        { name: "Contact", url: "/#contact", description: "Formulaire de contact et informations" }
+        { name: "Accueil", url: "/", description: "Page d'accueil du portfolio" }
       ]
     },
     {
@@ -27,14 +20,7 @@ const Sitemap = () => {
         { name: "Article de blog", url: "/blog/:id", description: "Page complète d'un article de blog" }
       ]
     },
-    {
-      title: "Administration",
-      icon: <Shield className="h-5 w-5" />,
-      links: [
-        { name: "Connexion admin", url: "/login", description: "Interface de connexion administrateur" },
-        { name: "Dashboard admin", url: "/admin", description: "Gestion du contenu du portfolio" }
-      ]
-    },
+
     {
       title: "Pages légales",
       icon: <Shield className="h-5 w-5" />,
@@ -56,7 +42,7 @@ const Sitemap = () => {
               <h1 className="text-3xl font-bold text-gray-900">Plan du site</h1>
               <p className="text-gray-600 mt-2">Architecture et navigation du portfolio</p>
             </div>
-            <Button onClick={() => window.location.href = '/'} variant="outline">
+            <Button className='cursor-pointer' onClick={() => window.location.href = '/'} variant="outline">
               <Home className="mr-2 h-4 w-4" />
               Retour à l'accueil
             </Button>
@@ -95,10 +81,7 @@ const Sitemap = () => {
         </div>
 
         {/* Footer info */}
-        <div className="mt-12 text-center text-gray-500">
-          <p>Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}</p>
-          <p className="mt-2">Portfolio de Julien Dupont - Développeur Full Stack</p>
-        </div>
+     
       </main>
     </div>
   );

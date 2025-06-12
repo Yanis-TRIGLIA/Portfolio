@@ -9,6 +9,9 @@ import AccessDenied from "../components/auth/AccessDenied";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import BlogDetail from "../pages/BlogDetail";
 import Sitemap from "../pages/Sitemap";
+import MentionsLegales from "../pages/MentionsLegales";
+import PolitiqueConfidentialite from "../pages/PolitiqueConfidentialite";
+import NotFound from "../pages/NotFound";
 
 export const router = createBrowserRouter([
   {
@@ -24,15 +27,23 @@ export const router = createBrowserRouter([
   },
   {
     path: "plan_du_site",
-    element:<Sitemap/>,
+    element: <Sitemap />,
   },
   {
     path: "project/:id",
     element: <ProjectDetail />,
   },
   {
-    path:"blog/:id",
-    element: <BlogDetail />, 
+    path: "mentions-legales",
+    element: <MentionsLegales />
+  },
+  {
+    path: "politique-confidentialite",
+    element: <PolitiqueConfidentialite />
+  },
+  {
+    path: "blog/:id",
+    element: <BlogDetail />,
   },
   {
     path: "admin",
@@ -46,5 +57,11 @@ export const router = createBrowserRouter([
     path: "access-denied",
     element: <AccessDenied />,
   },
+
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+
 
 ]);
