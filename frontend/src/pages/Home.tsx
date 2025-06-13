@@ -593,10 +593,8 @@ const Home = () => {
 
                     <div className="space-y-8">
 
-                        <Card
-                            className={`p-6 sm:p-8 border-l-4 border-yellow-400/45 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-                                }`}
-                        >
+                        {/* Alternance - La Ligne Web */}
+                        <Card className={`p-6 sm:p-8 border-l-4 border-yellow-400/45 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">
@@ -605,33 +603,39 @@ const Home = () => {
                                     </div>
                                     <div className="flex items-center">
                                         <Building className="mr-2 h-5 w-5 text-gray-600" />
-                                        <span className="font-medium text-gray-800 text-sm sm:text-base">La Ligne Web</span>
+                                        <a href='https://la-ligne-web.com/' target='_blank' className="font-medium text-gray-800 text-sm sm:text-base">La Ligne Web</a>
                                     </div>
                                     <div className="flex items-start">
                                         <MapPin className="mr-2 h-4 w-4 text-gray-600 mt-1 flex-shrink-0" />
-                                        <span className="text-gray-600 text-sm">
-                                            1140 Rue André Ampère, Aix-en-Provence
-                                        </span>
+                                        <a href='https://maps.app.goo.gl/sBfCHuvn89qHh62XA' target='_blank' className="text-gray-600 text-sm">1140 Rue André Ampère, Aix-en-Provence</a>
                                     </div>
                                 </div>
                                 <div className="md:col-span-2">
                                     <div className="flex items-center mb-4">
                                         <Briefcase className="mr-2 h-5 w-5 text-blue-600" />
                                         <h3 className="text-lg sm:text-xl font-bold text-gray-800">
-                                            Alternace Management d'architecture et d'application logicielles
+                                            Alternance – Management d'architecture et d'applications logicielles
                                         </h3>
                                     </div>
-                                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                                        Développement de site web via des framework tels que Laravel , mise en place de stratégie d'architecture via certain projet .
-                                        approfidisssement du travail d'équipe et surtout du travail en autonomie
-                                    </p>
+                                    <div className="text-gray-600 leading-relaxed text-sm sm:text-base space-y-4">
+                                        <p>
+                                            Développement d’applications web modernes à l’aide de frameworks tels que <strong>Laravel</strong>.
+                                            Participation à la définition et à la mise en œuvre d’architectures logicielles adaptées aux projets.
+                                        </p>
+                                        <p>
+                                            Approfondissement du <strong>travail en autonomie</strong> tout en collaborant avec les équipes. Lecture de <strong>cahiers des charges</strong> pour comprendre les besoins techniques et fonctionnels.
+                                        </p>
+                                        <p>
+                                            Rôle technique de <strong>Product Owner</strong> : communication directe avec le PO pour recueillir les besoins, proposer des correctifs et identifier les évolutions.
+                                        </p>
+                                        <p className="mt-4">🛠️ Technologies : Laravel (PHP), React, TypeScript, Tailwind CSS, MySQL/MariaDB, commandes Unix</p>
+                                    </div>
                                 </div>
                             </div>
                         </Card>
-                        <Card
-                            className={`p-6 sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-                                }`}
-                        >
+
+                        {/* Stage Front-End - La Ligne Web */}
+                        <Card className={`p-6 sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">
@@ -640,13 +644,11 @@ const Home = () => {
                                     </div>
                                     <div className="flex items-center">
                                         <Building className="mr-2 h-5 w-5 text-gray-600" />
-                                        <span className="font-medium text-gray-800 text-sm sm:text-base">La Ligne Web</span>
+                                        <a href='https://la-ligne-web.com/' target='_blank' className="font-medium text-gray-800 text-sm sm:text-base">La Ligne Web</a>
                                     </div>
                                     <div className="flex items-start">
                                         <MapPin className="mr-2 h-4 w-4 text-gray-600 mt-1 flex-shrink-0" />
-                                        <span className="text-gray-600 text-sm">
-                                            1140 Rue André Ampère, Aix-en-Provence
-                                        </span>
+                                        <a href='https://maps.app.goo.gl/sBfCHuvn89qHh62XA' target='_blank' className="text-gray-600 text-sm">1140 Rue André Ampère, Aix-en-Provence</a>
                                     </div>
                                 </div>
                                 <div className="md:col-span-2">
@@ -656,25 +658,19 @@ const Home = () => {
                                             Stage de développement Front-End React
                                         </h3>
                                     </div>
-                                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                                        Développement d'interfaces utilisateur modernes et responsives en utilisant React et TypeScript.
-                                        Collaboration avec l'équipe de design pour implémenter des solutions créatives et optimisées.
-                                    </p>
-
-                                    <div className="space-y-2 text-gray-600 text-sm sm:text-base mt-8">
-                                        <p>• Création d'une application from scratch ressemblant à un réseau professionnel (type LinkedIn)</p>
-                                        <p>• Développement en mode agile (méthode SCRUM)</p>
-                                        <p>• Front-End : React + TypeScript</p>
-                                        <p>• Back-End : Laravel (PHP) et Java Spring Boot</p>
-                                        <p>• Participation à la maintenance évolutive des applications du CSN</p>
-                                        <p>• Technologies : Java, Spring Boot, PostgreSQL, Angular + TypeScript</p>
+                                    <div className="text-gray-600 leading-relaxed text-sm sm:text-base space-y-4">
+                                        <p>
+                                            Conception d’interfaces utilisateur modernes, responsives et maintenables en <strong>React</strong> et <strong>TypeScript</strong>.
+                                            Intégration de maquettes issues de l’équipe design et mise en place de composants dynamiques.
+                                        </p>
+                                        <p>
+                                            Participation à la création d’une application type <strong>réseau professionnel</strong> (type LinkedIn) dans un cadre <strong>SCRUM</strong>.
+                                            Implication sur le front-end comme sur les échanges API avec le back-end.
+                                        </p>
+                                        <p className="mt-4">🛠️ Technologies : React, TypeScript, Tailwind CSS, Laravel (PHP), Spring Boot (Java), MySQL/MariaDB, commandes Unix</p>
                                     </div>
-
-                                        <div className="mt-4">
-                                        <a
-                                            href="https://dringgo.fr/"
-                                            className="text-blue-600 hover:underline flex items-center text-sm"
-                                        >
+                                    <div className="mt-4">
+                                        <a href="https://dringgo.fr/" className="text-blue-600 hover:underline flex items-center text-sm" target='_blank'>
                                             <ExternalLink className="mr-1 h-4 w-4" />
                                             Voir le projet Dringgo (Réseau d'entreprise)
                                         </a>
@@ -683,10 +679,8 @@ const Home = () => {
                             </div>
                         </Card>
 
-                        <Card
-                            className={`p-6 sm:p-8 border-l-4 border-green-500 transition-all duration-1000 delay-300 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
-                                }`}
-                        >
+                        {/* Stage Full Stack - Alithya */}
+                        <Card className={`p-6 sm:p-8 border-l-4 border-green-500 transition-all duration-1000 delay-300 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">
@@ -695,13 +689,11 @@ const Home = () => {
                                     </div>
                                     <div className="flex items-center">
                                         <Building className="mr-2 h-5 w-5 text-gray-600" />
-                                        <span className="font-medium text-gray-800 text-sm sm:text-base">Alithya</span>
+                                        <a href='https://www.alithya.com/fr' target='_blank' className="font-medium text-gray-800 text-sm sm:text-base">Alithya</a>
                                     </div>
                                     <div className="flex items-start">
                                         <MapPin className="mr-2 h-4 w-4 text-gray-600 mt-1 flex-shrink-0" />
-                                        <span className="text-gray-600 text-sm">
-                                            25 Rue de la Petite Duranne, Aix-en-Provence
-                                        </span>
+                                        <a href='https://maps.app.goo.gl/LzK9jbQYqy7Rgt8S6' target='_blank' className="text-gray-600 text-sm">25 Rue de la Petite Duranne, Aix-en-Provence</a>
                                     </div>
                                 </div>
                                 <div className="md:col-span-2">
@@ -711,20 +703,20 @@ const Home = () => {
                                             Stage de développement Full Stack
                                         </h3>
                                     </div>
-                                    <div className="space-y-2 text-gray-600 text-sm sm:text-base">
-                                        <p>• Participation à la maintenance évolutive des applications du
-                                            Centre de Solutions Numérique (CSN) , pour des clients dans le
-                                            domaine du Sport et sur des projets internes à Alithya.</p>
-                                        <p>• Les technologies utilisées étaient Java, Spring Boot, PostgreSQL
-                                            pour le back-end et côté front-end Angular et TypeScript.</p>
-                                        <p>• Apprentissage poussé à l’autonomie avec des tâches full-stack
-                                            fournies depuis des backlogs (différents selon les sprints).</p>
+                                    <div className="text-gray-600 leading-relaxed text-sm sm:text-base space-y-4">
+                                        <p>
+                                            Contribution à la maintenance évolutive des solutions numériques du <strong>CSN</strong> pour divers clients du secteur du sport, ainsi que sur des outils internes à <strong>Alithya</strong>.
+                                        </p>
+                                        <p>
+                                            Réalisation de tâches <strong>full-stack</strong> dans le cadre d’un fonctionnement agile, à partir de <strong>backlogs</strong> planifiés sur plusieurs sprints.
+                                        </p>
+                                        <p>
+                                            Développement côté back-end avec <strong>Java, Spring Boot et PostgreSQL</strong>, et côté front-end avec <strong>Angular et TypeScript</strong>.
+                                        </p>
+                                        <p className="mt-4"> 🛠️ Technologies : Java, Spring Boot, PostgreSQL, Angular, TypeScript</p>
                                     </div>
                                     <div className="mt-4">
-                                        <a
-                                            href="https://eden.fftir.org/"
-                                            className="text-blue-600 hover:underline flex items-center text-sm"
-                                        >
+                                        <a href="https://eden.fftir.org/" className="text-blue-600 hover:underline flex items-center text-sm" target='_blank'>
                                             <ExternalLink className="mr-1 h-4 w-4" />
                                             Voir le projet EDEN (Fédération Française de Tir)
                                         </a>
@@ -732,9 +724,11 @@ const Home = () => {
                                 </div>
                             </div>
                         </Card>
+
                     </div>
                 </div>
             </section>
+
 
 
             <ProjectsSection

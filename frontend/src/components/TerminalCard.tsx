@@ -62,6 +62,7 @@ export const TerminalCard: React.FC<TerminalCardProps> = ({
             onClick={handleMaximize}
             className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-400 transition-colors cursor-pointer"
             title={isMaximized ? "Restaurer" : "Agrandir"}
+            disabled
           />
         </div>
         <div className="ml-4 text-gray-400 text-sm font-mono">
