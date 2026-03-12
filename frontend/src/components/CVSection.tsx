@@ -7,7 +7,7 @@ const CVSection = () => {
         <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
           Curriculum Vitae
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center pl-3 pr-3">
           <div>
             <h3 className="text-xl font-semibold mb-4 text-gray-700">Un CV toujours à jour</h3>
             <p className="text-gray-600 leading-relaxed mb-4">

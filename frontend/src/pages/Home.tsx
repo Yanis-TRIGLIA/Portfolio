@@ -586,12 +586,12 @@ const Home = () => {
 
 
             <section id="experience" className="py-20 overflow-x-hidden" ref={experiencesRef}>
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto px-4 ">
                     <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Expériences
                     </h2>
 
-                    <div className="space-y-8">
+                    <div className="space-y-8 xl:pl-24 xl:pr-24 pl-1 pr-1">
 
                         {/* Alternance - La Ligne Web */}
                         <Card className={`p-6 sm:p-8 border-l-4 border-yellow-400/45 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
@@ -635,7 +635,7 @@ const Home = () => {
                         </Card>
 
                         {/* Stage Front-End - La Ligne Web */}
-                        <Card className={`p-6 sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
+                        <Card className={`p-6   sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">

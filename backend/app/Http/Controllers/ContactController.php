@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Log;
+use App\Models\Contact;
 
 class ContactController extends Controller
 {
@@ -38,7 +39,9 @@ class ContactController extends Controller
 
         // Vérification du CAPTCHA
         Log::debug('Vérification du CAPTCHA');
-        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+        $response = Http::withOptions([
+            'verify' => app()->isProduction()
+        ])->asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
             'secret' => env('RECAPTCHA_SECRET_KEY'),
             'response' => $request->captcha
         ]);
@@ -62,6 +65,16 @@ class ContactController extends Controller
             ]);
 
             Mail::to(env('MAIL_TO_ADDRESS'))->send(new ContactFormMail($request->all()));
+
+            // Sauvegarde en base de données
+            Contact::create([
+                'first_name' => $request->firstName,
+                'last_name'  => $request->lastName,
+                'email'      => $request->email,
+                'phone'      => $request->phone,
+                'subject'    => $request->subject,
+                'message'    => $request->message,
+            ]);
             
             Log::info('Email envoyé avec succès');
             
