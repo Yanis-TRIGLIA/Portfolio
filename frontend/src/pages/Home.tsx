@@ -343,7 +343,7 @@ const Home = () => {
                     <div className="grid md:grid-cols-2 gap-16 items-start">
                         <div className="flex justify-start space-x-2">
                             <img
-                                src="https://www.einerd.com/wp-content/uploads/2017/10/dragonballsuper-transforma%C3%A7%C3%A3oGokucapa-890x606.jpg"
+                                src="https://media.licdn.com/dms/image/v2/D4E03AQHCdDjx4fm5_w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1705933859095?e=1775088000&v=beta&t=xW1wx42kqsNILuRpENAaHdUrCfVnzmWZvScBjCT-GD0"
                                 alt="Portrait"
                                 className="w-52 h-52 rounded-full object-cover shadow-lg"
                             />
