@@ -326,7 +326,7 @@ const ProjectsSection = ({ visibleSections, onSectionVisibilityChange }: Project
                             key={project.id}
                             id={project.id}
                             title={project.name}
-                            description={project.description}
+                            short_description={project.short_description}
                             image={`${VITE_API_BASE}${project.images}`}
                             tags={project.tag.map(tag => tag.name)}
                             onClose={() => handleCloseProject(project.id)}

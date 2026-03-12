@@ -26,6 +26,7 @@ type Project_table = {
   name: string;
   created_at: string;
   description: string;
+  short_description?: string;
   images: string;
   tag: Tag_table[];
   link_project: string;
@@ -170,6 +171,7 @@ const ProjectsManager = () => {
 
       const formData = new FormData();
       formData.append('name', (e.currentTarget.querySelector('#name') as HTMLInputElement).value);
+      formData.append('short_description', (e.currentTarget.querySelector('#short_description') as HTMLInputElement).value);
       formData.append('description', (e.currentTarget.querySelector('#description') as HTMLTextAreaElement).value);
       formData.append('slug', (e.currentTarget.querySelector('#name') as HTMLInputElement).value.toLowerCase().replace(/\s+/g, '-'));
 
@@ -430,7 +432,18 @@ const ProjectsManager = () => {
               </div>
 
               <div>
-                <Label htmlFor="description">Description *</Label>
+                <Label htmlFor="short_description">Courte description *</Label>
+                <Input
+                  id="short_description"
+                  defaultValue={editingProject?.short_description || ''}
+                  required
+                  disabled={loading}
+                  maxLength={255}
+                  placeholder="Résumé court pour la carte projet"
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description longue *</Label>
                 <Textarea
                   id="description"
                   defaultValue={editingProject?.description || ''}
@@ -531,6 +544,7 @@ const ProjectsManager = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Projet</TableHead>
+              <TableHead>Courte description</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead>Date de création</TableHead>
@@ -541,13 +555,13 @@ const ProjectsManager = () => {
           <TableBody>
             {loading && projects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={7} className="text-center py-8">
                   Chargement des projets...
                 </TableCell>
               </TableRow>
             ) : projects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                   Aucun projet trouvé. Créez votre premier projet !
                 </TableCell>
               </TableRow>
@@ -557,6 +571,11 @@ const ProjectsManager = () => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="font-medium">{project.name}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="max-w-xs truncate" title={project.short_description}>
+                      {project.short_description}
                     </div>
                   </TableCell>
                   <TableCell>

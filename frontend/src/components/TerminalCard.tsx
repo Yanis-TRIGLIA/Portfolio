@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 interface TerminalCardProps {
   id: number;
   title: string;
-  description: string;
+  short_description: string;
   image: string;
   tags: string[];
   onClose?: () => void;
@@ -14,7 +14,7 @@ interface TerminalCardProps {
 export const TerminalCard: React.FC<TerminalCardProps> = ({ 
   id,
   title, 
-  description, 
+  short_description,
   image, 
   tags,
   onClose 
@@ -95,9 +95,8 @@ export const TerminalCard: React.FC<TerminalCardProps> = ({
               <span className="text-yellow-400">## </span>
               <span className="text-white font-semibold">{title}</span>
             </div>
-            
             <div className="text-gray-300 text-xs leading-relaxed">
-              {description}
+              {short_description}
             </div>
             
             {/* Tags */}

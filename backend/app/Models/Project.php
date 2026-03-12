@@ -13,10 +13,10 @@ class Project extends Model
         'name',
         'slug',
         'description',
+        'short_description',
         'images',
         'link_project',
         'github_project',
- 
     ];
 
   
