@@ -349,7 +349,7 @@ const Home = () => {
                             />
 
                             <p className="text-white text-base md:text-lg leading-relaxed py-5">
-                                Je suis un développeur web passionné avec un intérêt marqué pour les technologies émergentes,
+                                Je suis un développeur fullstack passionné avec un intérêt marqué pour les technologies émergentes,
                                 l’open source et le design fonctionnel. Mon parcours m’a permis de développer une solide
                                 capacité d’adaptation, une grande curiosité et un goût pour la collaboration.
                             </p>
