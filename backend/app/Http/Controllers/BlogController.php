@@ -30,6 +30,7 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
+            'short_description' => 'nullable|string|max:255',
             'content' => 'required|json',
             'read_time' => 'required|integer|min:1',
             // allow up to 5MB here; ensure php.ini upload_max_filesize/post_max_size >= 5M
@@ -138,9 +139,10 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'string|max:255',
             'slug' => 'string|max:255',
+            'short_description' => 'nullable|string|max:255',
             'content' => 'json',
             'read_time' => 'integer|min:1',
-            'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'tag' => 'array',
             'tag.*' => 'exists:tags,id',
             'meta_title' => 'string|max:255',

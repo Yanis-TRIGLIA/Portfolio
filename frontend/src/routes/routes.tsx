@@ -8,12 +8,17 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import AccessDenied from "../components/auth/AccessDenied";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import BlogDetail from "../pages/BlogDetail";
+import Blog from "../pages/Blog";
 import Sitemap from "../pages/Sitemap";
 import MentionsLegales from "../pages/MentionsLegales";
 import PolitiqueConfidentialite from "../pages/PolitiqueConfidentialite";
 import NotFound from "../pages/NotFound";
 
 export const router = createBrowserRouter([
+  {
+    path: "blog",
+    element: <Blog />,
+  },
   {
     path: "/",
     element: <HomeLayout />,

@@ -167,6 +167,7 @@ const BlogManager = () => {
       formData.append('slug', (e.currentTarget.querySelector('#title') as HTMLInputElement).value.toLowerCase().replace(/\s+/g, '-'));
       formData.append('meta_title', (e.currentTarget.querySelector('#meta_title') as HTMLInputElement).value);
       formData.append('meta_description', (e.currentTarget.querySelector('#meta_description') as HTMLTextAreaElement).value);
+      formData.append('short_description', (e.currentTarget.querySelector('#short_description') as HTMLInputElement).value);
 
       selectedTags.forEach(tagId => {
         formData.append('tag[]', tagId.toString());
@@ -317,6 +318,16 @@ const BlogManager = () => {
               </div>
 
               <div>
+                <div className='mb-4'>
+                  <Label htmlFor="short_description">Courte description</Label>
+                  <Input
+                    id="short_description"
+                    defaultValue={editingPost?.short_description || ''}
+                    disabled={loading}
+                  />
+                </div>
+
+              <div>
                 <Label htmlFor="content">Contenu *</Label>
 
                 <EditorJSComponent
@@ -325,6 +336,8 @@ const BlogManager = () => {
                   onImageUpload={handleImageUpload}
                 />
 
+
+              </div>
 
               </div>
 

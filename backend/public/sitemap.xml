@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://yanis-triglia.fr/</loc>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://yanis-triglia.fr/blog</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://yanis-triglia.fr/mentions-legales</loc>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://yanis-triglia.fr/politique-confidentialite</loc>
+    <priority>0.3</priority>
+  </url>
+
+  <!--
+    Pour inclure automatiquement les articles de blog, générez ce fichier lors du build
+    (ex: script qui récupère /blog depuis l'API et écrit les <url> pour chaque article).
+  -->
+
+</urlset>

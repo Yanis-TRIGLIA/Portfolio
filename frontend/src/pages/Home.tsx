@@ -27,6 +27,7 @@ const Home = () => {
     const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
     const [tag, setTag] = useState<Tag[]>([]);
     const [blog, setBlog] = useState<Blog[]>([]);
+    const [blogCount, setBlogCount] = useState<number>(0);
     const [showTitle, setShowTitle] = useState(false);
     const [showDesc, setShowDesc] = useState(false);
 
@@ -123,7 +124,11 @@ const Home = () => {
     const getallblog = async () => {
         try {
             const response = await api.get('/blog', null);
-            setBlog(response as Blog[]);
+            const all = response as Blog[];
+            // sort by created_at desc and keep only 3 latest for home preview
+            const sorted = all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            setBlog(sorted.slice(0, 3));
+            setBlogCount(all.length);
         } catch (error) {
             console.error('Erreur lors de la récupération des posts:', error);
         }
@@ -371,17 +376,17 @@ const Home = () => {
                                 <TabsContent value="languages" className="mt-6">
                                     <div className="grid grid-cols-3 gap-4 text-center">
                                         <div className="flex flex-col items-center">
-                                            <span className="text-4xl mb-2">🇫🇷</span>
+                                            <img src="/images/france.webp" alt="Français" className="w-12 h-8 object-cover mb-2 rounded" />
                                             <span className="text-sm font-medium text-white">Français</span>
                                             <span className="text-xs text-gray-400">Langue maternelle</span>
                                         </div>
                                         <div className="flex flex-col items-center">
-                                            <span className="text-4xl mb-2">🇬🇧</span>
+                                            <img src="/images/angleterre.jpg" alt="Anglais" className="w-12 h-8 object-cover mb-2 rounded" />
                                             <span className="text-sm font-medium text-white">Anglais</span>
                                             <span className="text-xs text-gray-400">Niveau B2</span>
                                         </div>
                                         <div className="flex flex-col items-center">
-                                            <span className="text-4xl mb-2">🇮🇹</span>
+                                            <img src="/images/italy.png" alt="Italien" className="w-12 h-8 object-cover mb-2 rounded" />
                                             <span className="text-sm font-medium text-white">Italien</span>
                                             <span className="text-xs text-gray-400">Niveau B1</span>
                                         </div>
@@ -745,9 +750,16 @@ const Home = () => {
 
             <section id="blog" className="py-20" ref={blogRef}>
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif categories text-gray-800 leading-tight">
-                        Blog
-                    </h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-3xl font-bold font-serif categories text-gray-800 leading-tight">Blog</h2>
+                        <div className="flex items-center space-x-4">
+                            {blogCount > 3 && (
+                                <>
+                                    <a href="/blog" className="text-sm text-blue-600 hover:underline">Voir plus d'articles</a>
+                                </>
+                            )}
+                        </div>
+                    </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {blog.map((post, index) => (
                             <Card
@@ -766,7 +778,7 @@ const Home = () => {
                                 </div>
                                 <CardContent className="p-6">
                                     <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-                                    <p className="text-gray-600">{post.slug}</p>
+                                    <p className="text-gray-600">{post.short_description}</p>
                                 </CardContent>
                             </Card>
                         ))}
