@@ -57,7 +57,7 @@ const Headers = () => {
                             <div>
                                 <button type="button" onClick={visibilityMenu} className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                                     <span className="sr-only">Open user menu</span>
-                                    <img className="h-8 w-8 rounded-full cursor-pointer" src="../../public/images/yanis.jpg" alt="" />
+                                    <img className="h-8 w-8 rounded-full cursor-pointer" src="/images/yanis.jpg" alt="" />
                                 </button>
                             </div>
                             {visiblemenu && (

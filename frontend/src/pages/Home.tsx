@@ -348,7 +348,7 @@ const Home = () => {
                     <div className="grid md:grid-cols-2 gap-16 items-start">
                         <div className="flex justify-start space-x-2">
                             <img
-                                src="../../public/images/yanis.jpg"
+                                src="/images/yanis.jpg"
                                 alt="Portrait"
                                 className="w-52 h-52 rounded-full object-cover shadow-lg"
                             />
