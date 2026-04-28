@@ -1,11 +1,18 @@
-const VITE_API_BASE: string = import.meta.env.VITE_API_BASE;
-const API_BASE = `${VITE_API_BASE}api`;
+const configuredApiBase = import.meta.env.VITE_API_BASE?.trim();
+const runtimeOrigin =
+  typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+const baseOrigin = configuredApiBase || runtimeOrigin;
+const normalizedBase = baseOrigin.endsWith('/') ? baseOrigin : `${baseOrigin}/`;
+const API_BASE = new URL('api/', normalizedBase).toString().replace(/\/$/, '');
 
 export const api = {
     async login(email: string, password: string) {
         const res = await fetch(`${API_BASE}/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
             body: JSON.stringify({ email, password }),
         });
 
@@ -15,7 +22,10 @@ export const api = {
 
     async get<T>(url: string, token: null | string) {
         const res = await fetch(`${API_BASE}${url}`, {
-            headers: { Authorization: `Bearer ${token}`, 'Accept': 'application/json' },
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Accept': 'application/json',
+            },
         });
         return res.json() as Promise<T>;
     },
