@@ -4,6 +4,7 @@ export type Blog_table = {
   created_at: string;
   title: string;
   slug: string;
+  short_description?: string;
   content: string;
   meta_title: string;
   meta_description: string;
@@ -28,6 +29,7 @@ export type Project_table = {
   name: string;
   created_at: string;
   description: string;
+  short_description: string;
   images: string;
   tag: Tag_table[];
   link_project: string;

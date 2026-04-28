@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent,  CardHeader, CardTitle } from '../../components/ui/card';
-import { LogOut, FolderOpen, FileText, Tag } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { LogOut, FolderOpen, FileText, Tag, Mail, Users } from 'lucide-react';
 import ProjectsManager from '../../components/admin/ProjectsManager';
 import BlogManager from '../../components/admin/BlogManager';
 import { TagsManager } from '../../components/admin/TagsManager';
+import ContactsManager from '../../components/admin/ContactsManager';
+import VisitorsManager from '../../components/admin/VisitorsManager';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -42,7 +44,7 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <div className="p-6">
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 max-w-md mb-8 bg-gray-300/50 rounded-lg ">
+          <TabsList className="grid w-full grid-cols-5 max-w-2xl mb-8 bg-gray-300/50 rounded-lg ">
             <TabsTrigger value="projects" className="flex items-center gap-2 cursor-pointer">
               <FolderOpen className="w-4 h-4 " />
               Projets
@@ -54,6 +56,14 @@ const AdminDashboard = () => {
             <TabsTrigger value="tags" className="flex items-center gap-2 cursor-pointer">
               <Tag className="w-4 h-4" />
               Tags
+            </TabsTrigger>
+            <TabsTrigger value="contacts" className="flex items-center gap-2 cursor-pointer">
+              <Mail className="w-4 h-4" />
+              Messages
+            </TabsTrigger>
+            <TabsTrigger value="visitors" className="flex items-center gap-2 cursor-pointer">
+              <Users className="w-4 h-4" />
+              Visiteurs
             </TabsTrigger>
           </TabsList>
 
@@ -83,9 +93,29 @@ const AdminDashboard = () => {
 
           <TabsContent value="tags">
             <Card>
-
               <TagsManager />
+            </Card>
+          </TabsContent>
 
+          <TabsContent value="contacts">
+            <Card className="bg-white shadow-md">
+              <CardHeader>
+                <CardTitle>Messages de contact</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ContactsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="visitors">
+            <Card className="bg-white shadow-md">
+              <CardHeader>
+                <CardTitle>Visiteurs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <VisitorsManager />
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>

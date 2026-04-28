@@ -35,6 +35,7 @@ export const api = {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
+                'Accept': 'application/json',
             },
             body: JSON.stringify(data),
         });
@@ -48,6 +49,7 @@ export const api = {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
+                'Accept': 'application/json',
             },
             body: JSON.stringify(data),
         });
@@ -58,7 +60,7 @@ export const api = {
     async delete(url: string, token: string) {
         const res = await fetch(`${API_BASE}${url}`, {
             method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}`, 'Accept': 'application/json' },
         });
 
         if (!res.ok) throw new Error('Échec de la requête DELETE');
@@ -71,11 +73,22 @@ export const api = {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
             },
             body: formData,
         });
 
-        if (!res.ok) throw new Error('Échec de la requête POST');
+        if (!res.ok) {
+            let bodyText: string;
+            try {
+                bodyText = await res.text();
+            } catch (e) {
+                bodyText = '<unable to read response body>';
+            }
+            const msg = `POST ${url} failed: ${res.status} ${res.statusText} - ${bodyText}`;
+            console.error(msg);
+            throw new Error(msg);
+        }
         return res.json() as Promise<T>;
     },
 
@@ -84,11 +97,22 @@ export const api = {
             method: 'POST', 
             headers: {
                 'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
             },
             body: formData,
         });
 
-        if (!res.ok) throw new Error('Échec de la requête PUT');
+        if (!res.ok) {
+            let bodyText: string;
+            try {
+                bodyText = await res.text();
+            } catch (e) {
+                bodyText = '<unable to read response body>';
+            }
+            const msg = `PUT ${url} failed: ${res.status} ${res.statusText} - ${bodyText}`;
+            console.error(msg);
+            throw new Error(msg);
+        }
         return res.json() as Promise<T>;
     }
 

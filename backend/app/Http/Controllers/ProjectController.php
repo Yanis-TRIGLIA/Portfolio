@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\project;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use SebastianBergmann\CodeCoverage\Report\Xml\Project as XmlProject;
 
 class ProjectController extends Controller
 {
@@ -34,6 +33,7 @@ class ProjectController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'description' => 'required|string',
+            'short_description' => 'required|string|max:255',
             'link_project' => 'nullable|string|max:255',
             'github_project' => 'nullable|string|max:255',
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -62,8 +62,8 @@ class ProjectController extends Controller
             'link_project' => $validated['link_project'] ?? null,
             'github_project' => $validated['github_project'] ?? null,
             'description' => $validated['description'],
+            'short_description' => $validated['short_description'],
             'images' => $validated['images_url'],
-
         ]);
 
 
@@ -90,6 +90,7 @@ class ProjectController extends Controller
             'link_project' => 'nullable|string|max:255',
             'github_project' => 'nullable|string|max:255',
             'description' => 'string',
+            'short_description' => 'string|max:255',
             'image_url' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tag' => 'array',
             'tag.*' => 'exists:tags,id',

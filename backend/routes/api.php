@@ -3,9 +3,11 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactAdminController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VisitorController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +51,15 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::post('/contact', [ContactController::class, 'send']);
+Route::post('/visitor/track', [VisitorController::class, 'track']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/contacts', [ContactAdminController::class, 'index']);
+    Route::put('/contacts/{id}/read', [ContactAdminController::class, 'markAsRead']);
+    Route::delete('/contacts/{id}', [ContactAdminController::class, 'destroy']);
+
+    Route::get('/visitors', [VisitorController::class, 'index']);
+});
 
 
 

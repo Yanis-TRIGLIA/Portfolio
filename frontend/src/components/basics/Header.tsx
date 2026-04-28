@@ -57,7 +57,7 @@ const Headers = () => {
                             <div>
                                 <button type="button" onClick={visibilityMenu} className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                                     <span className="sr-only">Open user menu</span>
-                                    <img className="h-8 w-8 rounded-full cursor-pointer" src="https://www.einerd.com/wp-content/uploads/2017/10/dragonballsuper-transforma%C3%A7%C3%A3oGokucapa-890x606.jpg" alt="" />
+                                    <img className="h-8 w-8 rounded-full cursor-pointer" src="/images/yanis.jpg" alt="" />
                                 </button>
                             </div>
                             {visiblemenu && (

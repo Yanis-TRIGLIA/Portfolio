@@ -27,6 +27,7 @@ const Home = () => {
     const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
     const [tag, setTag] = useState<Tag[]>([]);
     const [blog, setBlog] = useState<Blog[]>([]);
+    const [blogCount, setBlogCount] = useState<number>(0);
     const [showTitle, setShowTitle] = useState(false);
     const [showDesc, setShowDesc] = useState(false);
 
@@ -123,7 +124,11 @@ const Home = () => {
     const getallblog = async () => {
         try {
             const response = await api.get('/blog', null);
-            setBlog(response as Blog[]);
+            const all = response as Blog[];
+            // sort by created_at desc and keep only 3 latest for home preview
+            const sorted = all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            setBlog(sorted.slice(0, 3));
+            setBlogCount(all.length);
         } catch (error) {
             console.error('Erreur lors de la récupération des posts:', error);
         }
@@ -343,13 +348,13 @@ const Home = () => {
                     <div className="grid md:grid-cols-2 gap-16 items-start">
                         <div className="flex justify-start space-x-2">
                             <img
-                                src="https://www.einerd.com/wp-content/uploads/2017/10/dragonballsuper-transforma%C3%A7%C3%A3oGokucapa-890x606.jpg"
+                                src="/images/yanis.jpg"
                                 alt="Portrait"
                                 className="w-52 h-52 rounded-full object-cover shadow-lg"
                             />
 
                             <p className="text-white text-base md:text-lg leading-relaxed py-5">
-                                Je suis un développeur web passionné avec un intérêt marqué pour les technologies émergentes,
+                                Je suis un développeur fullstack passionné avec un intérêt marqué pour les technologies émergentes,
                                 l’open source et le design fonctionnel. Mon parcours m’a permis de développer une solide
                                 capacité d’adaptation, une grande curiosité et un goût pour la collaboration.
                             </p>
@@ -371,17 +376,17 @@ const Home = () => {
                                 <TabsContent value="languages" className="mt-6">
                                     <div className="grid grid-cols-3 gap-4 text-center">
                                         <div className="flex flex-col items-center">
-                                            <span className="text-4xl mb-2">🇫🇷</span>
+                                            <img src="/images/france.webp" alt="Français" className="w-12 h-8 object-cover mb-2 rounded" />
                                             <span className="text-sm font-medium text-white">Français</span>
                                             <span className="text-xs text-gray-400">Langue maternelle</span>
                                         </div>
                                         <div className="flex flex-col items-center">
-                                            <span className="text-4xl mb-2">🇬🇧</span>
+                                            <img src="/images/angleterre.jpg" alt="Anglais" className="w-12 h-8 object-cover mb-2 rounded" />
                                             <span className="text-sm font-medium text-white">Anglais</span>
                                             <span className="text-xs text-gray-400">Niveau B2</span>
                                         </div>
                                         <div className="flex flex-col items-center">
-                                            <span className="text-4xl mb-2">🇮🇹</span>
+                                            <img src="/images/italy.png" alt="Italien" className="w-12 h-8 object-cover mb-2 rounded" />
                                             <span className="text-sm font-medium text-white">Italien</span>
                                             <span className="text-xs text-gray-400">Niveau B1</span>
                                         </div>
@@ -586,12 +591,12 @@ const Home = () => {
 
 
             <section id="experience" className="py-20 overflow-x-hidden" ref={experiencesRef}>
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto px-4 ">
                     <h2 className="text-3xl font-bold mb-12 font-serif text-gray-800 leading-tight categories">
                         Expériences
                     </h2>
 
-                    <div className="space-y-8">
+                    <div className="space-y-8 xl:pl-24 xl:pr-24 pl-1 pr-1">
 
                         {/* Alternance - La Ligne Web */}
                         <Card className={`p-6 sm:p-8 border-l-4 border-yellow-400/45 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
@@ -635,7 +640,7 @@ const Home = () => {
                         </Card>
 
                         {/* Stage Front-End - La Ligne Web */}
-                        <Card className={`p-6 sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
+                        <Card className={`p-6   sm:p-8 border-l-4 border-blue-500 transition-all duration-1000 ${visibleSections.has('experiences') ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center">
@@ -745,9 +750,16 @@ const Home = () => {
 
             <section id="blog" className="py-20" ref={blogRef}>
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold mb-12 font-serif categories text-gray-800 leading-tight">
-                        Blog
-                    </h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-3xl font-bold font-serif categories text-gray-800 leading-tight">Blog</h2>
+                        <div className="flex items-center space-x-4">
+                            {blogCount > 3 && (
+                                <>
+                                    <a href="/blog" className="text-sm text-blue-600 hover:underline">Voir plus d'articles</a>
+                                </>
+                            )}
+                        </div>
+                    </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {blog.map((post, index) => (
                             <Card
@@ -766,7 +778,7 @@ const Home = () => {
                                 </div>
                                 <CardContent className="p-6">
                                     <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-                                    <p className="text-gray-600">{post.slug}</p>
+                                    <p className="text-gray-600">{post.short_description}</p>
                                 </CardContent>
                             </Card>
                         ))}

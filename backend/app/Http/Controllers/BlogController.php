@@ -30,9 +30,11 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
+            'short_description' => 'nullable|string|max:255',
             'content' => 'required|json',
             'read_time' => 'required|integer|min:1',
-            'cover' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // allow up to 5MB here; ensure php.ini upload_max_filesize/post_max_size >= 5M
+            'cover' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'tag' => 'required|array',
             'tag.*' => 'exists:tags,id',
             'meta_title' => 'string|max:255',
@@ -43,11 +45,46 @@ class BlogController extends Controller
 
         if ($request->hasFile('cover')) {
             $image = $request->file('cover');
-            $filename = 'cover_blog/' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $name = uniqid() . '.' . $image->getClientOriginalExtension();
+            $dir = public_path('storage/cover_blog');
 
-            $image->move(public_path('storage/cover_blog'), $filename);
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
 
-            $validated['cover'] = 'storage/' . $filename;
+            // Check PHP upload validity and provide detailed debug info on failure
+            if (! $image->isValid()) {
+                $err = $image->getError();
+                Log::error('Cover upload invalid. Error code: ' . $err);
+                return response()->json([
+                    'message' => 'The cover failed to upload.',
+                    'debug' => [
+                        'is_valid' => false,
+                        'error_code' => $err,
+                        'client_name' => $image->getClientOriginalName(),
+                        'size' => $image->getSize(),
+                        'upload_max_filesize' => ini_get('upload_max_filesize'),
+                        'post_max_size' => ini_get('post_max_size'),
+                    ],
+                ], 422);
+            }
+
+            try {
+                $image->move($dir, $name);
+                $validated['cover'] = 'storage/cover_blog/' . $name;
+            } catch (\Exception $e) {
+                Log::error('Cover upload failed: ' . $e->getMessage());
+                return response()->json([
+                    'message' => 'The cover failed to upload.',
+                    'debug' => [
+                        'exception' => $e->getMessage(),
+                        'client_name' => $image->getClientOriginalName(),
+                        'size' => $image->getSize(),
+                        'upload_max_filesize' => ini_get('upload_max_filesize'),
+                        'post_max_size' => ini_get('post_max_size'),
+                    ],
+                ], 422);
+            }
         }
 
 
@@ -66,17 +103,28 @@ class BlogController extends Controller
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
         ]);
 
         $image = $request->file('image');
-        $filename = 'blog_images/' . uniqid() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('storage/blog_images'), $filename);
+        $name = uniqid() . '.' . $image->getClientOriginalExtension();
+        $dir = public_path('storage/blog_images');
+
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        try {
+            $image->move($dir, $name);
+        } catch (\Exception $e) {
+            Log::error('Blog image upload failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Image upload failed'], 422);
+        }
 
         return response()->json([
             'success' => 1,
             'file' => [
-                'url' => asset('storage/' . $filename),
+                'url' => asset('storage/blog_images/' . $name),
             ],
         ]);
     }
@@ -91,9 +139,10 @@ class BlogController extends Controller
         $validated = $request->validate([
             'title' => 'string|max:255',
             'slug' => 'string|max:255',
+            'short_description' => 'nullable|string|max:255',
             'content' => 'json',
             'read_time' => 'integer|min:1',
-            'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'cover' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'tag' => 'array',
             'tag.*' => 'exists:tags,id',
             'meta_title' => 'string|max:255',

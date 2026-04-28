@@ -6,13 +6,13 @@ import { Download, FileText, Eye, EyeOff } from 'lucide-react';
 const CVViewer = () => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const cvPath = '../../../public/pdf/cv.pdf';
+  const cvPath = '/pdf/cv.pdf';
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center">
+        <CardTitle className="sm:flex items-center justify-between">
+          <div className="flex items-center mb-2">
             <FileText className="mr-2 h-6 w-6 text-blue-600" />
             Mon CV
           </div>
